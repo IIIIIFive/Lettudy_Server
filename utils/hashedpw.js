@@ -1,12 +1,12 @@
 const crypto = require("crypto");
 
-const hashPassword = (password, salt) => {
+const hashPassword = (password, salt, length = 50) => {
   return new Promise((resolve, reject) => {
     crypto.pbkdf2(password, salt, 1000, 64, "sha512", (err, derivedKey) => {
       if (err) {
         return reject(err);
       }
-      resolve(derivedKey.toString("hex"));
+      resolve(derivedKey.toString("hex").slice(0, length));
     });
   });
 };

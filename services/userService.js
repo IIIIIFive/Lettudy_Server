@@ -2,6 +2,7 @@ const conn = require("../utils/db");
 const userQueries = require("../queries/userQueries");
 const { v4: uuidv4 } = require("uuid");
 const { generateSalt, hashPassword } = require("../utils/hashedpw");
+const { createAccessToken } = require("../middlewares/auth");
 
 const join = async (name, email, password) => {
   try {
@@ -34,19 +35,72 @@ const login = async (email, password) => {
     const userData = userResult[0][0];
 
     if (!userData) {
-      throw new Error("이메일이 다시 입력해주세요");
+      throw new Error("이메일을 다시 입력해주세요");
     }
 
-    const pw = hashPassword(password, salt);
-    if (userData && userData.password == pw) {
-      //   const accessToken = createAccessToken(userData.id);
+    const hashedPassword = await hashPassword(password, userData.salt);
 
+    if (userData.password !== hashedPassword) {
+      throw new Error("비밀번호가 일치하지 않습니다");
+    }
+
+    // jwt 발급
+    const accessToken = createAccessToken(userData.id);
+
+    return {
+      message: "로그인 성공",
+      userId: userData.id,
+      token: accessToken,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+const deleteUser = async (userId) => {
+  try {
+    await conn.query(userQueries.deleteUser, userId);
+
+    return {
+      message: "회원 탈퇴 성공",
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
+const checkEmail = async (email) => {
+  try {
+    const emailResult = await conn.query(userQueries.checkEmail, email);
+    const { count } = emailResult[0][0];
+
+    if (count) {
       return {
-        message: "로그인 성공",
-        userId: userData.id,
-        // token: accessToken,
+        message: "이미 존재하는 이메일입니다.",
+      };
+    } else {
+      return {
+        message: "사용 가능한 이메일입니다.",
       };
     }
+  } catch (err) {
+    throw err;
+  }
+};
+
+const resetPassword = async (token, newPassword) => {
+  try {
+    const decoded = verifyToken(token);
+    const userId = decoded.id;
+
+    const salt = await generateSalt();
+    const hashedPw = await hashPassword(newPassword, salt);
+
+    await conn.query(userQueries.updatePassword, [hashedPw, salt, userId]);
+
+    return {
+      message: "비밀번호 재설정 성공",
+    };
   } catch (err) {
     throw err;
   }
@@ -55,4 +109,7 @@ const login = async (email, password) => {
 module.exports = {
   join,
   login,
+  deleteUser,
+  checkEmail,
+  resetPassword,
 };

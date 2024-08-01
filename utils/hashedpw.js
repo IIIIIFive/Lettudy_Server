@@ -23,7 +23,7 @@ const generateSalt = (length = 16) => {
 };
 
 const createCode = () => {
-  return crypto.randomBytes(3).toString("hex");
+  return crypto.randomBytes(5).toString("hex");
 };
 
 module.exports = {

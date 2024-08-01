@@ -1,27 +1,25 @@
 const roomQueries = {
-  createRoom:
-    "INSERT INTO rooms (id, owner_id, title, code) VALUES (?, ?, ?, ?)",
-  updateRoom: `
+  createRoom: "INSERT INTO rooms (id, owner_id, title) VALUES (?, ?, ?)",
+  updateRoomMemberCount: `
     UPDATE rooms
     SET member_count = member_count + 1
-    WHERE code = ?
+    WHERE id = ?
   `,
   createMember: "INSERT INTO members (id, user_id, room_id) VALUES(?, ?, ?)",
-  checkCode: "SELECT COUNT(*) AS count FROM rooms WHERE code = ?",
-  getRoomByCode: `
-    SELECT rooms.id as id, title, code, notice, member_count, owner_id, name as owner
+  checkId: "SELECT COUNT(*) AS count FROM rooms WHERE id = ?",
+  getRoomById: `
+    SELECT rooms.id as id, title, notice, member_count, owner_id, name as owner
     FROM rooms 
     LEFT JOIN users 
     ON users.id = rooms.owner_id 
-    WHERE code = ?`,
+    WHERE rooms.id = ?`,
   checkMember: `
     SELECT COUNT(*) AS count
     FROM members
-    LEFT JOIN rooms ON members.room_id = rooms.id
-    WHERE members.user_id = ? AND rooms.code = ?
+    WHERE members.room_id = ? AND members.user_id = ?
   `,
   getRooms: `
-    SELECT * 
+    SELECT rooms.* 
     FROM rooms 
     LEFT JOIN members 
     ON rooms.id = members.room_id

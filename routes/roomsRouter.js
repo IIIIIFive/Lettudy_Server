@@ -2,15 +2,15 @@ const express = require("express");
 const { verifyToken } = require("../middlewares/auth");
 const {
   createRoom,
-  getRoomByCode,
+  getRoomById,
   createMember,
   getRooms,
 } = require("../controllers/roomsController");
 const roomRouter = express.Router();
 
 roomRouter.post("/", verifyToken, createRoom);
-roomRouter.get("/:roomCode", verifyToken, getRoomByCode);
-roomRouter.post("/:roomCode/member", verifyToken, createMember);
+roomRouter.get("/:roomId", verifyToken, getRoomById);
+roomRouter.post("/:roomId/member", verifyToken, createMember);
 roomRouter.get("/", verifyToken, getRooms);
 
 module.exports = roomRouter;

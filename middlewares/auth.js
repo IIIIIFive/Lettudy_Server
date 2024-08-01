@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
-require("dotenv").config();
+const { JWT_SECRET } = require("../settings");
 
 const createAccessToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: "1h" });
 };
 
 const verifyToken = (req, res, next) => {
@@ -16,7 +16,7 @@ const verifyToken = (req, res, next) => {
       .json({ message: "Access token이 필요합니다" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res
         .status(StatusCodes.FORBIDDEN)

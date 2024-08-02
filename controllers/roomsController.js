@@ -10,10 +10,15 @@ const createRoom = async (req, res) => {
       throw new Error("방 생성 실패");
     }
 
-    const id = await roomService.createRoom(userId, title);
-    await roomService.createMember(userId, id);
+    const { roomId, code } = await roomService.createRoom(userId, title);
+    const { memberId, profileNum } = await roomService.createMember(
+      userId,
+      code
+    );
 
-    res.status(StatusCodes.CREATED).json({ id });
+    res
+      .status(StatusCodes.CREATED)
+      .json({ code, roomId, memberId, profileNum });
   } catch (err) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       message: err.message,
@@ -21,18 +26,20 @@ const createRoom = async (req, res) => {
   }
 };
 
-const getRoomById = async (req, res) => {
+const getRoomByCode = async (req, res) => {
   try {
-    const roomId = req.params.roomId;
+    const code = req.params.roomCode;
 
-    const room = await roomService.getRoomById(roomId);
+    const room = await roomService.getRoomByCode(code);
 
     return res.status(StatusCodes.OK).json({
+      roomId: room.roomId,
       title: room.title,
-      id: room.id,
       notice: room.notice || "",
+      memberCount: room.member_count,
       ownerId: room.owner_id,
       owner: room.owner,
+      createdAt: room.created_at,
     });
   } catch (err) {
     return res.status(StatusCodes.NOT_FOUND).json({
@@ -44,11 +51,12 @@ const getRoomById = async (req, res) => {
 const createMember = async (req, res) => {
   try {
     const userId = req.userId;
-    const roomId = req.params.roomId;
-    await roomService.createMember(userId, roomId);
+    const code = req.params.roomCode;
+    const result = await roomService.createMember(userId, code);
 
     return res.status(StatusCodes.CREATED).json({
-      message: "스터디에 가입되었습니다.",
+      memberId: result.memberId,
+      profileNum: result.profileNum,
     });
   } catch (err) {
     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -63,7 +71,34 @@ const getRooms = async (req, res) => {
     const rooms = await roomService.getRooms(userId);
 
     return res.status(StatusCodes.OK).json({
+      count: rooms.length,
       rooms,
+    });
+  } catch (err) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: err.message,
+    });
+  }
+};
+
+const updateNotice = async (req, res) => {
+  try {
+    const roomId = req.params.roomId;
+    const userId = req.userId;
+    const { count } = await roomService.checkMember(userId, roomId);
+
+    if (count == 0) {
+      res.status(StatusCodes.FORBIDDEN).json({
+        message: "가입하지 않은 스터디입니다.",
+      });
+    }
+
+    const { notice } = req.body;
+
+    await roomService.updateNotice(userId, roomId, notice);
+
+    return res.status(StatusCodes.OK).json({
+      notice,
     });
   } catch (err) {
     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -74,7 +109,8 @@ const getRooms = async (req, res) => {
 
 module.exports = {
   createRoom,
-  getRoomById,
+  getRoomByCode,
   createMember,
   getRooms,
+  updateNotice,
 };

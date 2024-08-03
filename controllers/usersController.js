@@ -57,11 +57,11 @@ const checkEmail = async (req, res) => {
   }
 };
 
-// 비밀번호 재설정
-const resetPassword = async (req, res) => {
+// 마이페이지 회원 조회
+const getMyPage = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
-    const result = await userService.resetPassword(token, newPassword);
+    const userId = req.userId;
+    const result = await userService.getMyPage(userId);
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {
@@ -76,5 +76,5 @@ module.exports = {
   login,
   deleteUser,
   checkEmail,
-  resetPassword,
+  getMyPage,
 };

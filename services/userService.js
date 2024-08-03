@@ -1,7 +1,8 @@
 const conn = require("../utils/db");
 const userQueries = require("../queries/userQueries");
+const roomQueries = require("../queries/roomQueries");
 const { v4: uuidv4 } = require("uuid");
-const { generateSalt, hashPassword } = require("../utils/hashedpw");
+const { hashPassword, comparePassword } = require("../utils/hashedpw");
 const { createAccessToken } = require("../middlewares/auth");
 
 const join = async (name, email, password) => {
@@ -14,10 +15,9 @@ const join = async (name, email, password) => {
     }
 
     const userId = uuidv4();
-    const salt = await generateSalt();
-    const hashedpw = await hashPassword(password, salt);
+    const hashedPassword = await hashPassword(password);
 
-    let values = [userId, name, email, hashedpw, salt];
+    let values = [userId, name, email, hashedPassword];
 
     await conn.query(userQueries.createUser, values);
 
@@ -38,9 +38,9 @@ const login = async (email, password) => {
       throw new Error("이메일을 다시 입력해주세요");
     }
 
-    const hashedPassword = await hashPassword(password, userData.salt);
+    const isPasswordValid = await comparePassword(password, userData.password);
 
-    if (userData.password !== hashedPassword) {
+    if (!isPasswordValid) {
       throw new Error("비밀번호가 일치하지 않습니다");
     }
 
@@ -88,18 +88,20 @@ const checkEmail = async (email) => {
   }
 };
 
-const resetPassword = async (token, newPassword) => {
+const getMyPage = async (userId) => {
   try {
-    const decoded = verifyToken(token);
-    const userId = decoded.id;
+    const userResult = await conn.query(userQueries.getUserById, userId);
+    const user = userResult[0][0];
 
-    const salt = await generateSalt();
-    const hashedPw = await hashPassword(newPassword, salt);
-
-    await conn.query(userQueries.updatePassword, [hashedPw, salt, userId]);
+    const roomsResult = await conn.query(roomQueries.getUserRooms, userId);
+    const rooms = roomsResult[0][0];
 
     return {
-      message: "비밀번호 재설정 성공",
+      message: "마이페이지 조회 성공",
+      id: userId,
+      name: user.name,
+      email: user.email,
+      rooms,
     };
   } catch (err) {
     throw err;
@@ -111,5 +113,5 @@ module.exports = {
   login,
   deleteUser,
   checkEmail,
-  resetPassword,
+  getMyPage,
 };

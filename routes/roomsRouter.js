@@ -9,7 +9,7 @@ const {
 } = require("../controllers/roomsController");
 const roomRouter = express.Router();
 
-roomRouter.post("/", verifyToken, createRoom);
+roomRouter.post("/", verifyToken, createRoom); // 방 생성
 roomRouter.get("/:roomCode", verifyToken, getRoomByCode);
 roomRouter.post("/:roomCode/member", verifyToken, createMember);
 roomRouter.get("/", verifyToken, getRooms);

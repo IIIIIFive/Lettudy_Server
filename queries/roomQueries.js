@@ -27,12 +27,15 @@ const roomQueries = {
     LEFT JOIN members 
     ON rooms.id = members.room_id
     WHERE members.user_id = ?
+    GROUP BY rooms.id, rooms.title, rooms.code, rooms.notice, rooms.member_count, rooms.created_at, 
+                      members.id, members.profile_num, members.alarm, members.created_at
     ORDER BY members.created_at DESC`,
   updateNotice: `
     UPDATE rooms
     SET notice = ?
     WHERE id = ?
   `,
+  getUserRooms: `SELECT rooms.id, rooms.title FROM rooms JOIN members ON rooms.id = members.room_id WHERE members.user_id = ?`,
 };
 
 module.exports = roomQueries;

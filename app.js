@@ -19,8 +19,10 @@ app.listen(port, () => {
 // 라우터 설정
 const userRouter = require("./routes/usersRouter");
 const roomRouter = require("./routes/roomsRouter");
+const memberRouter = require("./routes/membersRouter");
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);
+app.use("/members", memberRouter);
 
 module.exports = app;

@@ -1,5 +1,6 @@
 const conn = require("../utils/db");
 const roomQueries = require("../queries/roomQueries");
+const chatQueries = require("../queries/chatQueries");
 const { v4: uuidv4 } = require("uuid");
 const { createCode } = require("../utils/hashedpw");
 
@@ -15,49 +16,17 @@ const generateUniqueCode = async () => {
   return code;
 };
 
-const checkMember = async (userId, roomId) => {
-  const [[{ id: memberId, count }]] = await conn.query(
-    roomQueries.checkMember,
-    [roomId, userId]
-  );
-
-  return { memberId, count };
-};
-
 const createRoom = async (userId, title) => {
   try {
     const roomId = uuidv4();
+    const chatId = uuidv4();
     const code = await generateUniqueCode();
 
     const values = [roomId, userId, title, code];
-
     await conn.query(roomQueries.createRoom, values);
+    await conn.query(chatQueries.createChat, [chatId, roomId]);
 
     return { roomId, code };
-  } catch (err) {
-    throw err;
-  }
-};
-
-const createMember = async (userId, code) => {
-  try {
-    const room = await getRoomByCode(code);
-    const { count } = await checkMember(userId, room.roomId);
-    if (count != 0) {
-      throw new Error("이미 가입된 스터디입니다.");
-    }
-
-    if (room.member_count >= 8) {
-      throw new Error("제한 인원을 초과하여 가입할 수 없는 스터디입니다.");
-    }
-
-    const memberId = uuidv4();
-    const values = [memberId, userId, room.roomId, room.member_count + 1];
-
-    await conn.query(roomQueries.createMember, values);
-    await conn.query(roomQueries.updateRoomMemberCount, room.roomId);
-
-    return { memberId, profileNum: room.member_count + 1 };
   } catch (err) {
     throw err;
   }
@@ -84,8 +53,7 @@ const getRooms = async (userId) => {
       roomId: room.id,
       title: room.title,
       code: room.code,
-      notice: room.notice,
-      memberId: room.member_id,
+      notice: room.notice || "",
       profileNum: room.profile_num,
       alarm: room.alarm,
       createdAt: room.created_at,
@@ -105,9 +73,7 @@ const updateNotice = async (roomId, notice) => {
 };
 
 module.exports = {
-  checkMember,
   createRoom,
-  createMember,
   getRoomByCode,
   getRooms,
   updateNotice,

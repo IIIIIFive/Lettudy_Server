@@ -1,6 +1,8 @@
 const conn = require("../utils/db");
 const scheduleQueries = require("../queries/scheduleQueries");
 const { v4: uuidv4 } = require("uuid");
+const CustomError = require("../utils/CustomError");
+const { StatusCodes } = require("http-status-codes");
 
 const createSchedule = async (
   userId,
@@ -18,7 +20,10 @@ const createSchedule = async (
     const userRoom = userResult[0][0];
 
     if (!userRoom) {
-      throw new Error("해당 스터디에 가입되어 있지 않은 회원입니다.");
+      throw new CustomError(
+        "해당 스터디에 가입되어 있지 않은 회원입니다.",
+        StatusCodes.FORBIDDEN
+      );
     }
 
     const scheduleId = uuidv4();
@@ -43,9 +48,30 @@ const createSchedule = async (
   }
 };
 
-const deleteSchedule = async (userId, scheduleId) => {
+const deleteSchedule = async (userId, roomId, scheduleId) => {
   try {
-    await conn.query(scheduleQueries.deleteSchedule, [scheduleId, userId]);
+    // 스터디방 멤버 여부 확인
+    const userResult = await conn.query(
+      scheduleQueries.getMemberByUserIdRoomId,
+      [userId, roomId]
+    );
+    const userRoom = userResult[0][0];
+
+    if (!userRoom) {
+      throw new CustomError(
+        "해당 스터디에 가입되어 있지 않은 회원입니다.",
+        StatusCodes.FORBIDDEN
+      );
+    }
+
+    const deleteResult = await conn.query(scheduleQueries.deleteSchedule, [
+      scheduleId,
+      userId,
+    ]);
+    // 존재하지 않는 일정 처리
+    if (deleteResult[0].affectedRows === 0) {
+      throw new CustomError("일정을 찾을 수 없습니다.", StatusCodes.NOT_FOUND);
+    }
 
     return {
       message: "일정 삭제 성공",
@@ -55,21 +81,31 @@ const deleteSchedule = async (userId, scheduleId) => {
   }
 };
 
-const getSchedule = async (userId, scheduleId) => {
+const getSchedule = async (userId, roomId) => {
   try {
-    const schedule = await conn.query(scheduleQueries.getSchedule, [
-      scheduleId,
-      userId,
-    ]);
-    const scheduleData = schedule[0][0];
+    // 스터디방 멤버 여부 확인
+    const userResult = await conn.query(
+      scheduleQueries.getMemberByUserIdRoomId,
+      [userId, roomId]
+    );
+    const userRoom = userResult[0][0];
 
-    if (!scheduleData) {
-      throw new Error("일정을 찾을 수 없습니다");
+    if (!userRoom) {
+      throw new CustomError(
+        "해당 스터디에 가입되어 있지 않은 회원입니다.",
+        StatusCodes.FORBIDDEN
+      );
     }
+
+    const schedulesResult = await conn.query(
+      scheduleQueries.getSchedulesByRoomId,
+      [roomId]
+    );
+    const schedules = schedulesResult[0];
 
     return {
       message: "일정 조회 성공",
-      schedule: scheduleData,
+      schedule: schedules,
     };
   } catch (err) {
     throw err;

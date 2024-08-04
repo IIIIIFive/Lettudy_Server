@@ -20,9 +20,11 @@ app.listen(port, () => {
 const userRouter = require("./routes/usersRouter");
 const roomRouter = require("./routes/roomsRouter");
 const memberRouter = require("./routes/membersRouter");
+const scheduleRouter = require("./routes/shedulesRouter");
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);
 app.use("/members", memberRouter);
+app.use("/schedules", scheduleRouter);
 
 module.exports = app;

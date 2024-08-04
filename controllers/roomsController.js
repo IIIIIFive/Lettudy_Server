@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const roomService = require("../services/roomService");
+const memberService = require("../services/memberService");
 
 const createRoom = async (req, res) => {
   try {
@@ -11,14 +12,9 @@ const createRoom = async (req, res) => {
     }
 
     const { roomId, code } = await roomService.createRoom(userId, title);
-    const { memberId, profileNum } = await roomService.createMember(
-      userId,
-      code
-    );
+    const profileNum = await memberService.createMember(userId, code);
 
-    res
-      .status(StatusCodes.CREATED)
-      .json({ code, roomId, memberId, profileNum });
+    res.status(StatusCodes.CREATED).json({ code, roomId, profileNum });
   } catch (err) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       message: err.message,
@@ -48,23 +44,6 @@ const getRoomByCode = async (req, res) => {
   }
 };
 
-const createMember = async (req, res) => {
-  try {
-    const userId = req.userId;
-    const code = req.params.roomCode;
-    const result = await roomService.createMember(userId, code);
-
-    return res.status(StatusCodes.CREATED).json({
-      memberId: result.memberId,
-      profileNum: result.profileNum,
-    });
-  } catch (err) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: err.message,
-    });
-  }
-};
-
 const getRooms = async (req, res) => {
   try {
     const userId = req.userId;
@@ -85,7 +64,7 @@ const updateNotice = async (req, res) => {
   try {
     const roomId = req.params.roomId;
     const userId = req.userId;
-    const { count } = await roomService.checkMember(userId, roomId);
+    const { count } = await memberService.checkMember(userId, roomId);
 
     if (count == 0) {
       res.status(StatusCodes.FORBIDDEN).json({
@@ -110,7 +89,6 @@ const updateNotice = async (req, res) => {
 module.exports = {
   createRoom,
   getRoomByCode,
-  createMember,
   getRooms,
   updateNotice,
 };

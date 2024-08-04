@@ -93,8 +93,13 @@ const getMyPage = async (userId) => {
     const userResult = await conn.query(userQueries.getUserById, userId);
     const user = userResult[0][0];
 
-    const roomsResult = await conn.query(roomQueries.getUserRooms, userId);
-    const rooms = roomsResult[0][0];
+    const [roomsResult] = await conn.query(roomQueries.getRooms, userId);
+    const rooms = roomsResult.map((room) => ({
+      roomId: room.id,
+      title: room.title,
+      alarm: room.alarm,
+      isOwner: room.owner_id === userId,
+    }));
 
     return {
       message: "마이페이지 조회 성공",

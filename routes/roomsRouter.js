@@ -3,7 +3,6 @@ const { verifyToken } = require("../middlewares/auth");
 const {
   createRoom,
   getRoomByCode,
-  createMember,
   getRooms,
   updateNotice,
 } = require("../controllers/roomsController");

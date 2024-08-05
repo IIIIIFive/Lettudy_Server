@@ -4,11 +4,16 @@ const { StatusCodes } = require("http-status-codes");
 // 일정 등록
 const createSchedule = async (req, res) => {
   try {
-    const userId = req.userId;
-    const { roomId, title, date, time, isAttendance } = req.body;
+    const roomId = req.roomId;
+    const { title, date, time, isAttendance } = req.body;
+
+    if (!title || !date || !time || !isAttendance) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        message: "요청값을 확인해주세요",
+      });
+    }
 
     const result = await scheduleService.createSchedule(
-      userId,
       roomId,
       title,
       date,
@@ -28,12 +33,9 @@ const createSchedule = async (req, res) => {
 const deleteSchedule = async (req, res) => {
   try {
     const userId = req.userId;
-    const { roomId, scheduleId } = req.params;
-    const result = await scheduleService.deleteSchedule(
-      userId,
-      roomId,
-      scheduleId
-    );
+
+    const { scheduleId } = req.params;
+    const result = await scheduleService.deleteSchedule(userId, scheduleId);
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {
@@ -47,8 +49,16 @@ const deleteSchedule = async (req, res) => {
 const getSchedule = async (req, res) => {
   try {
     const userId = req.userId;
-    const { roomId } = req.params;
-    const result = await scheduleService.getSchedule(userId, roomId);
+    const roomId = req.roomId;
+    const { isAttendance } = req.query;
+
+    let result;
+    if (isAttendance) {
+      result = await scheduleService.getAttendanceDate(userId, roomId);
+    } else {
+      result = await scheduleService.getSchedule(roomId);
+    }
+    console.log(result);
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {

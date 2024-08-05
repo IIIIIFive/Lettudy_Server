@@ -3,34 +3,29 @@ const scheduleQueries = require("../queries/scheduleQueries");
 const { v4: uuidv4 } = require("uuid");
 const CustomError = require("../utils/CustomError");
 const { StatusCodes } = require("http-status-codes");
+const memberQueries = require("../queries/memberQueries");
+const { createAttendance, deleteAttendances } = require("./attendanceService");
 
-const createSchedule = async (
-  userId,
-  roomId,
-  title,
-  date,
-  time,
-  isAttendance
-) => {
+const createSchedule = async (roomId, title, date, time, isAttendance) => {
   try {
-    const userResult = await conn.query(
-      scheduleQueries.getMemberByUserIdRoomId,
-      [userId, roomId]
-    );
-    const userRoom = userResult[0][0];
-
-    if (!userRoom) {
-      throw new CustomError(
-        "해당 스터디에 가입되어 있지 않은 회원입니다.",
-        StatusCodes.FORBIDDEN
-      );
-    }
-
     const scheduleId = uuidv4();
     const dateTime = new Date(`${date}T${time}`); // 날짜 + 시간
     const values = [scheduleId, roomId, title, dateTime, isAttendance];
 
     await conn.query(scheduleQueries.createSchedule, values);
+
+    if (isAttendance) {
+      const [memberResult] = await conn.query(memberQueries.getMembers, roomId);
+      const members = memberResult.map((member) => member.user_id);
+      const [attendanceResult] = await createAttendance(scheduleId, members);
+
+      if (attendanceResult.affectedRows === 0) {
+        throw new CustomError(
+          "출석부 등록에 실패했습니다.",
+          StatusCodes.BAD_REQUEST
+        );
+      }
+    }
 
     return {
       message: "일정 등록 성공",
@@ -48,29 +43,40 @@ const createSchedule = async (
   }
 };
 
-const deleteSchedule = async (userId, roomId, scheduleId) => {
+const deleteSchedule = async (userId, scheduleId) => {
   try {
-    // 스터디방 멤버 여부 확인
-    const userResult = await conn.query(
-      scheduleQueries.getMemberByUserIdRoomId,
-      [userId, roomId]
+    const [[scheduleResult]] = await conn.query(
+      scheduleQueries.getSchedule,
+      scheduleId
     );
-    const userRoom = userResult[0][0];
 
-    if (!userRoom) {
-      throw new CustomError(
-        "해당 스터디에 가입되어 있지 않은 회원입니다.",
-        StatusCodes.FORBIDDEN
-      );
+    // 존재하지 않는 일정 처리
+    if (!scheduleResult) {
+      throw new CustomError("일정을 찾을 수 없습니다.", StatusCodes.NOT_FOUND);
     }
 
-    const deleteResult = await conn.query(scheduleQueries.deleteSchedule, [
+    const isAttendance = scheduleResult.is_attendance;
+    if (isAttendance) {
+      const [attendanceResult] = await deleteAttendances(scheduleId);
+
+      if (attendanceResult.affectedRows === 0) {
+        throw new CustomError(
+          "출석부 삭제에 실패했습니다.",
+          StatusCodes.BAD_REQUEST
+        );
+      }
+    }
+
+    const [deleteResult] = await conn.query(scheduleQueries.deleteSchedule, [
       scheduleId,
       userId,
     ]);
-    // 존재하지 않는 일정 처리
-    if (deleteResult[0].affectedRows === 0) {
-      throw new CustomError("일정을 찾을 수 없습니다.", StatusCodes.NOT_FOUND);
+
+    if (deleteResult.affectedRows === 0) {
+      throw new CustomError(
+        "일정 삭제에 실패했습니다.",
+        StatusCodes.BAD_REQUEST
+      );
     }
 
     return {
@@ -81,22 +87,8 @@ const deleteSchedule = async (userId, roomId, scheduleId) => {
   }
 };
 
-const getSchedule = async (userId, roomId) => {
+const getSchedule = async (roomId) => {
   try {
-    // 스터디방 멤버 여부 확인
-    const userResult = await conn.query(
-      scheduleQueries.getMemberByUserIdRoomId,
-      [userId, roomId]
-    );
-    const userRoom = userResult[0][0];
-
-    if (!userRoom) {
-      throw new CustomError(
-        "해당 스터디에 가입되어 있지 않은 회원입니다.",
-        StatusCodes.FORBIDDEN
-      );
-    }
-
     const schedulesResult = await conn.query(
       scheduleQueries.getSchedulesByRoomId,
       [roomId]
@@ -112,8 +104,33 @@ const getSchedule = async (userId, roomId) => {
   }
 };
 
+const getAttendanceDate = async (userId, roomId) => {
+  try {
+    const [[attendanceResult]] = await conn.query(
+      scheduleQueries.getAttendanceDate,
+      [roomId, userId]
+    );
+
+    if (!attendanceResult) {
+      return {
+        message: "출석 일정이 없습니다.",
+      };
+    }
+
+    return {
+      attendanceId: attendanceResult.attendanceId,
+      title: attendanceResult.title,
+      date: attendanceResult.date.split(" ")[0],
+      time: attendanceResult.date.split(" ")[1],
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   createSchedule,
   deleteSchedule,
   getSchedule,
+  getAttendanceDate,
 };

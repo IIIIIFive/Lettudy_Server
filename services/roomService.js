@@ -3,6 +3,8 @@ const roomQueries = require("../queries/roomQueries");
 const chatQueries = require("../queries/chatQueries");
 const { v4: uuidv4 } = require("uuid");
 const { createCode } = require("../utils/hashedpw");
+const CustomError = require("../utils/CustomError");
+const { StatusCodes } = require("http-status-codes");
 
 const generateUniqueCode = async () => {
   let code;
@@ -34,8 +36,12 @@ const createRoom = async (userId, title) => {
 
 const getRoomByCode = async (code) => {
   try {
-    const [[{ id }]] = await conn.query(roomQueries.getIdByCode, code);
-    const [[room]] = await conn.query(roomQueries.getRoomById, id);
+    const [[getIdResult]] = await conn.query(roomQueries.getIdByCode, code);
+    if (!getIdResult) {
+      throw new Error("유효하지 않은 코드입니다.");
+    }
+
+    const [[room]] = await conn.query(roomQueries.getRoomById, getIdResult.id);
     if (!room) {
       throw new Error("존재하지 않는 스터디입니다.");
     }
@@ -72,9 +78,20 @@ const updateNotice = async (roomId, notice) => {
   }
 };
 
+const checkRoom = async (roomId) => {
+  try {
+    const [[{ count }]] = await conn.query(roomQueries.checkRoomId, roomId);
+
+    return count;
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   createRoom,
   getRoomByCode,
   getRooms,
   updateNotice,
+  checkRoom,
 };

@@ -74,7 +74,7 @@ const updateNotice = async (req, res) => {
 
     const { notice } = req.body;
 
-    await roomService.updateNotice(userId, roomId, notice);
+    await roomService.updateNotice(roomId, notice);
 
     return res.status(StatusCodes.OK).json({
       notice,

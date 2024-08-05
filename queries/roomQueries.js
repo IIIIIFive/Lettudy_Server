@@ -26,6 +26,11 @@ const roomQueries = {
     SET notice = ?
     WHERE id = ?
   `,
+  checkRoomId: `
+    SELECT COUNT(*) AS count
+    FROM rooms
+    WHERE id = ?
+  `,
 };
 
 module.exports = roomQueries;

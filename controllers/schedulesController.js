@@ -5,8 +5,7 @@ const { StatusCodes } = require("http-status-codes");
 const createSchedule = async (req, res) => {
   try {
     const userId = req.userId;
-    const { roomId } = req.params;
-    const { title, date, time, isAttendance } = req.body;
+    const { roomId, title, date, time, isAttendance } = req.body;
 
     const result = await scheduleService.createSchedule(
       userId,
@@ -19,7 +18,7 @@ const createSchedule = async (req, res) => {
 
     res.status(StatusCodes.CREATED).json(result);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(err.statusCode || 500).json({
       message: err.message,
     });
   }
@@ -29,12 +28,16 @@ const createSchedule = async (req, res) => {
 const deleteSchedule = async (req, res) => {
   try {
     const userId = req.userId;
-    const { scheduleId } = req.params;
-    const result = await scheduleService.deleteSchedule(userId, scheduleId);
+    const { roomId, scheduleId } = req.params;
+    const result = await scheduleService.deleteSchedule(
+      userId,
+      roomId,
+      scheduleId
+    );
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(err.statusCode || 500).json({
       message: err.message,
     });
   }
@@ -44,12 +47,12 @@ const deleteSchedule = async (req, res) => {
 const getSchedule = async (req, res) => {
   try {
     const userId = req.userId;
-    const { scheduleId } = req.params;
-    const result = await scheduleService.getSchedule(userId, scheduleId);
+    const { roomId } = req.params;
+    const result = await scheduleService.getSchedule(userId, roomId);
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(err.statusCode || 500).json({
       message: err.message,
     });
   }

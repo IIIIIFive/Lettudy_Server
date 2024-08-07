@@ -1,11 +1,12 @@
 const { StatusCodes } = require("http-status-codes");
 const memberService = require("../services/memberService");
+const roomService = require("../services/roomService");
 
 const createMember = async (req, res) => {
   try {
     const userId = req.userId;
     const code = req.params.roomCode;
-    const result = await memberService.createMember(userId, code);
+    const result = await roomService.createMember(userId, code);
 
     return res.status(StatusCodes.CREATED).json(result);
   } catch (err) {

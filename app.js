@@ -51,11 +51,13 @@ const roomRouter = require("./routes/roomsRouter");
 const memberRouter = require("./routes/membersRouter");
 const scheduleRouter = require("./routes/shedulesRouter");
 const chatRouter = require("./routes/chatsRouter");
+const attendanceRouter = require("./routes/attendancesRouter");
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);
 app.use("/members", memberRouter);
 app.use("/schedules", scheduleRouter);
 app.use("/chats", chatRouter);
+app.use("/attendances", attendanceRouter);
 
 module.exports = app;

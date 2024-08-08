@@ -118,6 +118,7 @@ const getAttendanceDate = async (userId, roomId) => {
     }
 
     return {
+      message: "출석 날짜 조회 성공",
       attendanceId: attendanceResult.attendanceId,
       title: attendanceResult.title,
       date: attendanceResult.date.split(" ")[0],

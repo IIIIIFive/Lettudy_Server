@@ -1,9 +1,14 @@
 const roomQueries = {
   createRoom:
-    "INSERT INTO rooms (id, owner_id, title, code) VALUES (?, ?, ?, ?)",
-  updateRoomMemberCount: `
+    "INSERT INTO rooms (id, owner_id, title, code, member_count) VALUES (?, ?, ?, ?, ?)",
+  increaseRoomMemberCount: `
     UPDATE rooms
     SET member_count = member_count + 1
+    WHERE id = ?
+  `,
+  decreaseRoomMembercount: `
+    UPDATE rooms
+    SET member_count = member_count - 1
     WHERE id = ?
   `,
   checkCode: "SELECT COUNT(*) AS count FROM rooms WHERE code = ?",

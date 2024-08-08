@@ -58,7 +58,6 @@ const getSchedule = async (req, res) => {
     } else {
       result = await scheduleService.getSchedule(roomId);
     }
-    console.log(result);
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {

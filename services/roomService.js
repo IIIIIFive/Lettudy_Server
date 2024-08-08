@@ -5,7 +5,6 @@ const { v4: uuidv4 } = require("uuid");
 const { createCode } = require("../utils/hashedpw");
 const CustomError = require("../utils/CustomError");
 const { StatusCodes } = require("http-status-codes");
-const { checkMember } = require("./memberService");
 const memberQueries = require("../queries/memberQueries");
 
 const generateUniqueCode = async () => {
@@ -25,50 +24,19 @@ const createRoom = async (userId, title) => {
     const roomId = uuidv4();
     const chatId = uuidv4();
     const code = await generateUniqueCode();
+    const profileNum = 1;
 
-    const values = [roomId, userId, title, code];
-    await conn.query(roomQueries.createRoom, values);
+    await conn.query(roomQueries.createRoom, [
+      roomId,
+      userId,
+      title,
+      code,
+      profileNum,
+    ]);
     await conn.query(chatQueries.createChat, [chatId, roomId]);
-    const { profileNum } = await createMember(userId, code);
+    await conn.query(memberQueries.createMember, [userId, roomId, profileNum]);
 
     return { message: "스터디 생성 성공", roomId, code, profileNum };
-  } catch (err) {
-    throw err;
-  }
-};
-
-const createMember = async (userId, code) => {
-  try {
-    const room = await getRoomByCode(code);
-    const count = await checkMember(userId, room.roomId);
-    if (count != 0) {
-      throw new CustomError(
-        "이미 가입된 스터디입니다.",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-
-    if (room.memberCount >= 8) {
-      throw new CustomError(
-        "제한 인원을 초과하여 가입할 수 없는 스터디입니다.",
-        StatusCodes.FORBIDDEN
-      );
-    }
-
-    const values = [userId, room.roomId, room.memberCount + 1];
-
-    const [memberResult] = await conn.query(memberQueries.createMember, values);
-
-    if (memberResult.affectedRows === 0) {
-      throw new CustomError("스터디 가입 실패", StatusCodes.BAD_REQUEST);
-    }
-
-    await conn.query(roomQueries.updateRoomMemberCount, room.roomId);
-
-    return {
-      message: "스터디 가입 성공",
-      profileNum: room.memberCount + 1,
-    };
   } catch (err) {
     throw err;
   }
@@ -159,7 +127,6 @@ const checkRoom = async (roomId) => {
 
 module.exports = {
   createRoom,
-  createMember,
   getRoomByCode,
   getRooms,
   updateNotice,

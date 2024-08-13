@@ -42,6 +42,10 @@ const memberQueries = {
     DELETE FROM members
     WHERE user_id = ? and room_id = ?
   `,
+
+  updateAlarm: `
+    UPDATE members SET alarm = ? WHERE user_id = ? AND room_id = ?
+  `,
 };
 
 module.exports = memberQueries;

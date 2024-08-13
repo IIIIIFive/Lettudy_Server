@@ -136,9 +136,30 @@ const deleteMember = async (userId, roomId) => {
   }
 };
 
+const updateAlarm = async (userId, roomId, alarm) => {
+  try {
+    const [updateAlarmResult] = await conn.query(memberQueries.updateAlarm, [
+      alarm,
+      userId,
+      roomId,
+    ]);
+
+    if (updateAlarmResult.affectedRows === 0) {
+      throw new CustomError("알람 변경 실패", StatusCodes.BAD_REQUEST);
+    }
+
+    return {
+      messsage: "알람 변경 성공",
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   createMember,
   checkMember,
   getMembersRecord,
   deleteMember,
+  updateAlarm,
 };

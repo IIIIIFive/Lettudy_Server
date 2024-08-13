@@ -7,7 +7,14 @@ const memberQueries = {
     WHERE members.room_id = ? AND members.user_id = ?
   `,
   getMembers: `
-    SELECT * FROM members WHERE room_id = ?
+    SELECT members.*, users.fcm_token as fcm_token, rooms.title as room_title
+    FROM members
+    JOIN users
+    ON users.id = members.user_id
+    JOIN rooms
+    ON rooms.id = members.room_id
+    WHERE members.room_id = ?
+
   `,
   getMembersName: `
     SELECT name
@@ -34,6 +41,10 @@ const memberQueries = {
   deleteMember: `
     DELETE FROM members
     WHERE user_id = ? and room_id = ?
+  `,
+
+  updateAlarm: `
+    UPDATE members SET alarm = ? WHERE user_id = ? AND room_id = ?
   `,
 };
 

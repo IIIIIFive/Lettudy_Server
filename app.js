@@ -8,8 +8,15 @@ const app = express();
 const port = PORT || 7777;
 
 app.use(express.json());
-app.use(cors());
 
+const corsOptions = {
+  origin: "http://localhost:5173", // 허용하고자 하는 도메인
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // 쿠키를 사용한 인증을 허용
+};
+
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {

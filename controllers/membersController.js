@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const memberService = require("../services/memberService");
+const CustomError = require("../utils/CustomError");
 
 const createMember = async (req, res) => {
   try {
@@ -42,4 +43,24 @@ const deleteMember = async (req, res) => {
   }
 };
 
-module.exports = { createMember, getMembersRecord, deleteMember };
+const updateAlarm = async (req, res) => {
+  try {
+    const roomId = req.roomId;
+    const userId = req.userId;
+    const { alarm } = req.body;
+
+    if (alarm === undefined) {
+      throw new CustomError("요청값을 확인해주세요.", StatusCodes.BAD_REQUEST);
+    }
+
+    const result = await memberService.updateAlarm(userId, roomId, alarm);
+
+    return res.status(StatusCodes.OK).json(result);
+  } catch (err) {
+    res.status(res.statusCode || 500).json({
+      message: err.message,
+    });
+  }
+};
+
+module.exports = { createMember, getMembersRecord, deleteMember, updateAlarm };

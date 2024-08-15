@@ -1,8 +1,8 @@
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
-const socketIo = require("socket.io");
 const { PORT } = require("./settings");
+const initSocket = require("./sockets/chatSocket");
 
 const app = express();
 const port = PORT || 7777;
@@ -18,38 +18,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "DELETE"],
-  },
-});
-
-global.io = io;
-
-io.on("connection", (socket) => {
-  console.log("New Client connected");
-
-  socket.on("joinRoom", (roomId) => {
-    socket.join(roomId);
-    console.log(`Client joiend room: ${roomId}`);
-  });
-
-  socket.on("sendMessage", (message) => {
-    io.to(message.roomId).emit("receiveMessage", message);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-});
+initSocket(server);
 
 app.get("/", (req, res) => {
   res.status(200).send("Lettudy Server");
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
 });
 
 // 라우터 설정
@@ -61,6 +33,7 @@ const chatRouter = require("./routes/chatsRouter");
 const attendanceRouter = require("./routes/attendancesRouter");
 const noteRouter = require("./routes/notesRouter");
 const tagRouter = require("./routes/tagsRouter");
+const linkRouter = require("./routes/linksRouter");
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);
@@ -70,5 +43,10 @@ app.use("/chats", chatRouter);
 app.use("/attendances", attendanceRouter);
 app.use("/notes", noteRouter);
 app.use("/tags", tagRouter);
+app.use("/links", linkRouter);
+
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
 module.exports = app;

@@ -11,6 +11,8 @@ const checkMember = async (userId, roomId) => {
     userId,
   ]);
 
+  console.log("checkMember Query Result: ", memberResult[0][0]);
+
   if (memberResult[0][0].count === 0) {
     throw new CustomError(
       "해당 스터디에 가입되어 있지 않은 회원입니다.",
@@ -154,6 +156,7 @@ const deleteMessage = async (userId, roomId, chatItemId) => {
 };
 
 module.exports = {
+  checkMember,
   getChats,
   sendMessage,
   sendImage,

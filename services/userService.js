@@ -4,6 +4,8 @@ const roomQueries = require("../queries/roomQueries");
 const { v4: uuidv4 } = require("uuid");
 const { hashPassword, comparePassword } = require("../utils/hashedpw");
 const { createAccessToken } = require("../middlewares/auth");
+const CustomError = require("../utils/CustomError");
+const { StatusCodes } = require("http-status-codes");
 
 const join = async (name, email, password) => {
   try {
@@ -11,7 +13,10 @@ const join = async (name, email, password) => {
     const user = emailResult[0][0];
 
     if (user) {
-      throw new Error("이미 존재하는 이메일입니다.");
+      throw new CustomError(
+        "이미 존재하는 이메일입니다.",
+        StatusCodes.BAD_REQUEST
+      );
     }
 
     const userId = uuidv4();
@@ -35,13 +40,19 @@ const login = async (email, password) => {
     const userData = userResult[0][0];
 
     if (!userData) {
-      throw new Error("이메일을 다시 입력해주세요");
+      throw new CustomError(
+        "이메일을 다시 입력해주세요",
+        StatusCodes.UNAUTHORIZED
+      );
     }
 
     const isPasswordValid = await comparePassword(password, userData.password);
 
     if (!isPasswordValid) {
-      throw new Error("비밀번호가 일치하지 않습니다");
+      throw new CustomError(
+        "비밀번호가 일치하지 않습니다",
+        StatusCodes.UNAUTHORIZED
+      );
     }
 
     // jwt 발급
@@ -75,14 +86,15 @@ const checkEmail = async (email) => {
     const { count } = emailResult[0][0];
 
     if (count) {
-      return {
-        message: "이미 존재하는 이메일입니다.",
-      };
-    } else {
-      return {
-        message: "사용 가능한 이메일입니다.",
-      };
+      throw new CustomError(
+        "이미 존재하는 이메일입니다.",
+        StatusCodes.BAD_REQUEST
+      );
     }
+
+    return {
+      message: "사용 가능한 이메일입니다.",
+    };
   } catch (err) {
     throw err;
   }
@@ -113,10 +125,39 @@ const getMyPage = async (userId) => {
   }
 };
 
+const updateFcmToken = async (userId, fcmToken) => {
+  const [updateResult] = await conn.query(userQueries.updateFcmToken, [
+    fcmToken,
+    userId,
+  ]);
+
+  if (updateResult.affectedRows === 0) {
+    throw new CustomError("fcm 토큰 등록 실패", StatusCodes.BAD_REQUEST);
+  }
+
+  return {
+    message: "fcm 토큰 등록 성공",
+  };
+};
+
+const deleteFcmToken = async (userId) => {
+  const [deleteResult] = await conn.query(userQueries.deleteFcmToken, userId);
+
+  if (deleteResult.affectedRows === 0) {
+    throw new CustomError("fcm 토큰 삭제 실패", StatusCodes.BAD_REQUEST);
+  }
+
+  return {
+    message: "fcm 토큰 삭제 성공",
+  };
+};
+
 module.exports = {
   join,
   login,
   deleteUser,
   checkEmail,
   getMyPage,
+  updateFcmToken,
+  deleteFcmToken,
 };

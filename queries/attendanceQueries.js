@@ -17,8 +17,12 @@ const attendanceQueries = {
     FROM attendances
     JOIN schedules
     ON schedules.id = attendances.schedule_id
-    WHERE attendances.user_id = ? AND schedules.room_id = ? AND schedules.date < NOW() OR attendances.status = 1
+    WHERE attendances.user_id = ? AND schedules.room_id = ? AND schedules.date < NOW()
     ORDER BY date DESC
+  `,
+  deleteMemberAttendances: `
+    DELETE FROM attendances
+    WHERE user_id = ? AND schedule_id IN (SELECT id FROM schedules WHERE room_id = ?)
   `,
 };
 

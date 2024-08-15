@@ -8,8 +8,15 @@ const app = express();
 const port = PORT || 7777;
 
 app.use(express.json());
-app.use(cors());
 
+const corsOptions = {
+  origin: "http://localhost:5173", // 허용하고자 하는 도메인
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true, // 쿠키를 사용한 인증을 허용
+};
+
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 initSocket(server);
 
@@ -24,6 +31,8 @@ const memberRouter = require("./routes/membersRouter");
 const scheduleRouter = require("./routes/shedulesRouter");
 const chatRouter = require("./routes/chatsRouter");
 const attendanceRouter = require("./routes/attendancesRouter");
+const noteRouter = require("./routes/notesRouter");
+const tagRouter = require("./routes/tagsRouter");
 const linkRouter = require("./routes/linksRouter");
 
 app.use("/users", userRouter);
@@ -32,6 +41,8 @@ app.use("/members", memberRouter);
 app.use("/schedules", scheduleRouter);
 app.use("/chats", chatRouter);
 app.use("/attendances", attendanceRouter);
+app.use("/notes", noteRouter);
+app.use("/tags", tagRouter);
 app.use("/links", linkRouter);
 
 server.listen(port, () => {

@@ -1,10 +1,26 @@
 const conn = require("../utils/db");
-const scheduleQueries = require("../queries/scheduleQueries");
 const { v4: uuidv4 } = require("uuid");
-const CustomError = require("../utils/CustomError");
+const schedule = require("node-schedule");
 const { StatusCodes } = require("http-status-codes");
+const CustomError = require("../utils/CustomError");
+const scheduleQueries = require("../queries/scheduleQueries");
 const memberQueries = require("../queries/memberQueries");
 const { createAttendance, deleteAttendances } = require("./attendanceService");
+const { sendPushNotification } = require("../utils/cloudMessaging");
+
+const createAttendanceAlarm = (
+  userToken,
+  attendanceDate,
+  roomTitle,
+  scheduleTitle
+) => {
+  const reminderTime = new Date(attendanceDate - 10 * 60 * 1000);
+  const messageTitle = `${roomTitle} 출석 안내`;
+  const messageBody = `${scheduleTitle} 일정이 10분 전입니다.`;
+  schedule.scheduleJob(reminderTime, () => {
+    sendPushNotification(userToken, messageTitle, messageBody);
+  });
+};
 
 const createSchedule = async (roomId, title, date, time, isAttendance) => {
   try {
@@ -16,8 +32,20 @@ const createSchedule = async (roomId, title, date, time, isAttendance) => {
 
     if (isAttendance) {
       const [memberResult] = await conn.query(memberQueries.getMembers, roomId);
-      const members = memberResult.map((member) => member.user_id);
-      const [attendanceResult] = await createAttendance(scheduleId, members);
+
+      memberResult.forEach((member) => {
+        if (member.alarm && member.fcm_token) {
+          createAttendanceAlarm(
+            member.fcm_token,
+            dateTime,
+            member.room_title,
+            title
+          );
+        }
+      });
+
+      const memberIds = memberResult.map((member) => member.user_id);
+      const [attendanceResult] = await createAttendance(scheduleId, memberIds);
 
       if (attendanceResult.affectedRows === 0) {
         throw new CustomError(
@@ -118,6 +146,7 @@ const getAttendanceDate = async (userId, roomId) => {
     }
 
     return {
+      message: "출석 날짜 조회 성공",
       attendanceId: attendanceResult.attendanceId,
       title: attendanceResult.title,
       date: attendanceResult.date.split(" ")[0],

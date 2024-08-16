@@ -24,6 +24,18 @@ const attendanceQueries = {
     DELETE FROM attendances
     WHERE user_id = ? AND schedule_id IN (SELECT id FROM schedules WHERE room_id = ?)
   `,
+  getAttendanceId: `
+    SELECT id
+    FROM attendances
+    WHERE user_id = ? AND schedule_id = ?
+  `,
+  getAttendancesByRoom: `
+    SELECT attendances.id as attendanceId, schedules.id as scheduleId, title, date
+    FROM attendances
+    LEFT JOIN schedules
+    ON schedules.id = attendances.schedule_id
+    WHERE user_id = ? AND room_id = ? AND date > NOW()
+  `,
 };
 
 module.exports = attendanceQueries;

@@ -39,6 +39,19 @@ const getNotes = async (req, res) => {
   }
 };
 
+const getNoteContent = async (req, res) => {
+  try {
+    const { noteId } = req.params;
+    const result = await noteService.getNoteContent(noteId);
+
+    return res.status(StatusCodes.OK).json(result);
+  } catch (err) {
+    res.status(err.statusCode || 500).json({
+      message: err.message,
+    });
+  }
+};
+
 const updateNote = async (req, res) => {
   try {
     const { noteId } = req.params;
@@ -69,4 +82,10 @@ const deleteNote = async (req, res) => {
   }
 };
 
-module.exports = { createNote, getNotes, updateNote, deleteNote };
+module.exports = {
+  createNote,
+  getNotes,
+  updateNote,
+  deleteNote,
+  getNoteContent,
+};

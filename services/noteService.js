@@ -140,6 +140,19 @@ const getNotes = async (roomId, tags, limit, currentPage) => {
   };
 };
 
+const getNoteContent = async (noteId) => {
+  try {
+    const note = await checkNote(noteId);
+
+    return {
+      message: "노트 조회 성공",
+      content: note.content,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
 const updateNote = async (noteId, title, content, tags) => {
   try {
     const note = await checkNote(noteId);
@@ -171,4 +184,10 @@ const deleteNote = async (noteId) => {
   }
 };
 
-module.exports = { createNote, getNotes, updateNote, deleteNote };
+module.exports = {
+  createNote,
+  getNotes,
+  updateNote,
+  deleteNote,
+  getNoteContent,
+};

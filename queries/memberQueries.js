@@ -14,14 +14,19 @@ const memberQueries = {
     JOIN rooms
     ON rooms.id = members.room_id
     WHERE members.room_id = ?
-
   `,
   getMembersName: `
-    SELECT name
+    SELECT name, profile_num
     FROM users
     JOIN members
     ON users.id = members.user_id
+    WHERE members.room_id = ?
     ORDER BY name
+  `,
+  getMembersCount: `
+    SELECT COUNT(*) as memberCount
+    FROM members
+    WHERE room_id = ?
   `,
   getMembersAttendanceCount: `
     SELECT users.name, members.profile_num, COUNT(attendances.id) AS count
@@ -32,19 +37,20 @@ const memberQueries = {
     WHERE members.room_id = ?
     GROUP BY users.id;
   `,
-  getProfiles: `
+  getMembersProfiles: `
     SELECT profile_num
     FROM members
     WHERE room_id = ?
   `,
-
   deleteMember: `
     DELETE FROM members
     WHERE user_id = ? and room_id = ?
   `,
-
   updateAlarm: `
     UPDATE members SET alarm = ? WHERE user_id = ? AND room_id = ?
+  `,
+  getAlarmsOff: `
+    UPDATE members SET alarm = false WHERE user_id = ?
   `,
 };
 

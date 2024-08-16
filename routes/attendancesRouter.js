@@ -7,7 +7,7 @@ const {
 } = require("../controllers/attendancesController");
 
 attendanceRouter.put(
-  "/:attendanceId",
+  "/:roomId",
   verifyToken,
   authorizeUser,
   updateAttendanceStatus

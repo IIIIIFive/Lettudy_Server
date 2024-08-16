@@ -5,7 +5,7 @@ const { StatusCodes } = require("http-status-codes");
 const createLink = async (req, res) => {
   try {
     const userId = req.userId;
-    const { roomId } = req.params;
+    const roomId = req.roomId;
     const { title, link } = req.body;
 
     const result = await linkService.createLink(roomId, userId, title, link);
@@ -21,10 +21,9 @@ const createLink = async (req, res) => {
 // 자료 조회
 const getLinks = async (req, res) => {
   try {
-    const userId = req.userId;
-    const { roomId } = req.params;
+    const roomId = req.roomId;
 
-    const result = await linkService.getLinks(roomId, userId);
+    const result = await linkService.getLinks(roomId);
 
     res.status(StatusCodes.OK).json(result);
   } catch (err) {
@@ -37,10 +36,9 @@ const getLinks = async (req, res) => {
 // 자료 삭제
 const deleteLink = async (req, res) => {
   try {
-    const userId = req.userId;
     const { linkId } = req.params;
 
-    const result = await linkService.deleteLink(linkId, userId);
+    const result = await linkService.deleteLink(linkId);
     res.status(StatusCodes.OK).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({

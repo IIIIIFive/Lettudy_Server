@@ -3,7 +3,7 @@ const noteQueries = {
     INSERT INTO notes (id, room_id, title, content) VALUES (?, ?, ?, ?)
   `,
   getNotesFilteredByTags: `
-    SELECT notes.id AS noteId, title, content, created_at AS createdAt
+    SELECT notes.id AS noteId, title, created_at AS createdAt
     FROM notes
     LEFT JOIN tags
     ON tags.note_id = notes.id
@@ -20,7 +20,7 @@ const noteQueries = {
     WHERE notes.room_id = ? AND tags.name IN ?
   `,
   getNotes: `
-    SELECT id AS noteId, title, content, created_at as createdAt
+    SELECT id AS noteId, title, created_at as createdAt
     FROM notes
     WHERE room_id = ?
     ORDER BY notes.created_at DESC

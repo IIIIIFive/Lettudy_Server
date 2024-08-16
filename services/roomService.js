@@ -1,11 +1,14 @@
 const conn = require("../utils/db");
 const roomQueries = require("../queries/roomQueries");
 const chatQueries = require("../queries/chatQueries");
+const memberQueries = require("../queries/memberQueries");
 const { v4: uuidv4 } = require("uuid");
 const { createCode } = require("../utils/hashedpw");
 const CustomError = require("../utils/CustomError");
 const { StatusCodes } = require("http-status-codes");
-const memberQueries = require("../queries/memberQueries");
+const { getMembersRecord } = require("./memberService");
+const { getAttendanceDate, getSchedule } = require("./scheduleService");
+const { getUserAttendances } = require("./attendanceService");
 
 const generateUniqueCode = async () => {
   let code;
@@ -19,6 +22,17 @@ const generateUniqueCode = async () => {
   return code;
 };
 
+const checkRoom = async (roomId) => {
+  // auth.js에서 사용
+  try {
+    const [[{ count }]] = await conn.query(roomQueries.checkRoomId, roomId);
+
+    return count;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const createRoom = async (userId, title) => {
   try {
     const roomId = uuidv4();
@@ -26,49 +40,11 @@ const createRoom = async (userId, title) => {
     const code = await generateUniqueCode();
     const profileNum = 1;
 
-    await conn.query(roomQueries.createRoom, [
-      roomId,
-      userId,
-      title,
-      code,
-      profileNum,
-    ]);
+    await conn.query(roomQueries.createRoom, [roomId, title, code]);
     await conn.query(chatQueries.createChat, [chatId, roomId]);
     await conn.query(memberQueries.createMember, [userId, roomId, profileNum]);
 
-    return { message: "스터디 생성 성공", roomId, code, profileNum };
-  } catch (err) {
-    throw err;
-  }
-};
-
-const getRoomByCode = async (code) => {
-  try {
-    const [[getIdResult]] = await conn.query(roomQueries.getIdByCode, code);
-    if (!getIdResult) {
-      throw new CustomError(
-        "유효하지 않은 스터디 코드입니다.",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-
-    const [[room]] = await conn.query(roomQueries.getRoomById, getIdResult.id);
-    if (!room) {
-      throw new CustomError(
-        "존재하지 않는 스터디입니다.",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-    return {
-      message: "스터디 조회 성공",
-      roomId: room.roomId,
-      title: room.title,
-      notice: room.notice || "",
-      memberCount: room.member_count,
-      ownerId: room.owner_id,
-      owner: room.owner,
-      createdAt: room.created_at,
-    };
+    return { message: "스터디 생성 성공", roomId };
   } catch (err) {
     throw err;
   }
@@ -80,12 +56,6 @@ const getRooms = async (userId) => {
     const rooms = roomsResult.map((room) => ({
       roomId: room.id,
       title: room.title,
-      code: room.code,
-      notice: room.notice || "",
-      profileNum: room.profile_num,
-      alarm: room.alarm,
-      createdAt: room.created_at,
-      joinedAt: room.joined_at,
     }));
 
     return {
@@ -109,26 +79,36 @@ const updateNotice = async (roomId, notice) => {
       throw new CustomError("공지 수정 실패", StatusCodes.BAD_REQUEST);
     }
 
-    return { message: "공지 수정 성공", notice };
+    return { message: "공지 수정 성공" };
   } catch (err) {
     throw err;
   }
 };
 
-const checkRoom = async (roomId) => {
-  try {
-    const [[{ count }]] = await conn.query(roomQueries.checkRoomId, roomId);
+const getRoom = async (roomId, userId) => {
+  const [[roomResult]] = await conn.query(roomQueries.getRoomById, roomId);
+  const { members } = await getMembersRecord(roomId);
+  const { date, time } = await getAttendanceDate(userId, roomId);
+  const { records: attendanceRecord } = await getUserAttendances(
+    userId,
+    roomId
+  );
+  const { schedules } = await getSchedule(roomId);
 
-    return count;
-  } catch (err) {
-    throw err;
-  }
+  return {
+    message: "스터디 조회 성공",
+    ...roomResult,
+    members,
+    nextAttendance: { date, time },
+    attendanceRecord,
+    schedules,
+  };
 };
 
 module.exports = {
+  checkRoom,
   createRoom,
-  getRoomByCode,
   getRooms,
   updateNotice,
-  checkRoom,
+  getRoom,
 };

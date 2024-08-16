@@ -67,7 +67,7 @@ const getUserAttendances = async (userId, roomId) => {
     const records = attendanceResult.map((record) => ({
       date: record.date.split(" ")[0],
       time: record.date.split(" ")[1],
-      status: record.status,
+      status: record.status === 1,
     }));
 
     return {

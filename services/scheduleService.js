@@ -135,7 +135,7 @@ const getSchedule = async (roomId) => {
       title: schedule.title,
       date: schedule.date.split(" ")[0],
       time: schedule.date.split(" ")[1],
-      isAttendance: schedule.is_attendance,
+      isAttendance: schedule.is_attendance === 1,
     }));
 
     return {

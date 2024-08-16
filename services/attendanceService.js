@@ -6,14 +6,22 @@ const { StatusCodes } = require("http-status-codes");
 
 const createAttendance = async (scheduleId, members) => {
   try {
-    const values = members.map((memberId) => [
-      uuidv4(),
-      scheduleId,
-      memberId,
-      false,
-    ]);
+    const attendanceIds = [];
+    const values = members.map((memberId) => {
+      const id = uuidv4();
+      attendanceIds.push(id);
+      return [id, scheduleId, memberId, false];
+    });
 
-    return await conn.query(attendanceQueries.createAttendances, [values]);
+    const [attendanceResult] = await conn.query(
+      attendanceQueries.createAttendances,
+      [values]
+    );
+
+    return {
+      attendanceIds,
+      attendanceResult,
+    };
   } catch (err) {
     throw err;
   }

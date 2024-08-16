@@ -6,6 +6,7 @@ const { hashPassword, comparePassword } = require("../utils/hashedpw");
 const { createAccessToken } = require("../middlewares/auth");
 const CustomError = require("../utils/CustomError");
 const { StatusCodes } = require("http-status-codes");
+const memberQueries = require("../queries/memberQueries");
 
 const join = async (name, email, password) => {
   try {
@@ -109,8 +110,7 @@ const getMyPage = async (userId) => {
     const rooms = roomsResult.map((room) => ({
       roomId: room.id,
       title: room.title,
-      alarm: room.alarm,
-      isOwner: room.owner_id === userId,
+      alarm: room.alarm === 1,
     }));
 
     return {
@@ -146,6 +146,8 @@ const deleteFcmToken = async (userId) => {
   if (deleteResult.affectedRows === 0) {
     throw new CustomError("fcm 토큰 삭제 실패", StatusCodes.BAD_REQUEST);
   }
+
+  await conn.query(memberQueries.getAlarmsOff, userId);
 
   return {
     message: "fcm 토큰 삭제 성공",

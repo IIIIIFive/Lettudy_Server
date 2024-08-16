@@ -21,7 +21,7 @@ const verifyToken = (req, res, next) => {
   jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err) {
       return res
-        .status(StatusCodes.FORBIDDEN)
+        .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "유효하지 않은 access token입니다" });
     }
     req.userId = decoded.id; // 토큰에서 사용자 ID를 요청 객체에 추가

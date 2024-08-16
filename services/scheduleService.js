@@ -5,11 +5,13 @@ const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../utils/CustomError");
 const scheduleQueries = require("../queries/scheduleQueries");
 const memberQueries = require("../queries/memberQueries");
-const { createAttendance, deleteAttendances } = require("./attendanceService");
+const { createAttendance } = require("./attendanceService");
 const { sendPushNotification } = require("../utils/cloudMessaging");
+const attendanceQueries = require("../queries/attendanceQueries");
 
 const createAttendanceAlarm = (
   userToken,
+  attendanceId,
   attendanceDate,
   roomTitle,
   scheduleTitle
@@ -17,9 +19,35 @@ const createAttendanceAlarm = (
   const reminderTime = new Date(attendanceDate - 10 * 60 * 1000);
   const messageTitle = `${roomTitle} 출석 안내`;
   const messageBody = `${scheduleTitle} 일정이 10분 전입니다.`;
-  schedule.scheduleJob(reminderTime, () => {
+  schedule.scheduleJob(attendanceId, reminderTime, () => {
     sendPushNotification(userToken, messageTitle, messageBody);
   });
+};
+
+const createMembersAttendance = async (scheduleId, roomId) => {
+  const [memberResult] = await conn.query(memberQueries.getMembers, roomId);
+
+  const memberIds = memberResult.map((member) => member.user_id);
+  const { attendanceResult, attendanceIds } = await createAttendance(
+    scheduleId,
+    memberIds
+  );
+
+  memberResult.forEach((member, idx) => {
+    if (member.alarm && member.fcm_token) {
+      createAttendanceAlarm(
+        member.fcm_token,
+        attendanceIds[idx],
+        dateTime,
+        member.room_title,
+        title
+      );
+    }
+  });
+
+  if (attendanceResult.affectedRows === 0) {
+    throw new CustomError("출석부 등록 실패", StatusCodes.BAD_REQUEST);
+  }
 };
 
 const createSchedule = async (roomId, title, date, time, isAttendance) => {
@@ -28,50 +56,28 @@ const createSchedule = async (roomId, title, date, time, isAttendance) => {
     const dateTime = new Date(`${date}T${time}`); // 날짜 + 시간
     const values = [scheduleId, roomId, title, dateTime, isAttendance];
 
-    await conn.query(scheduleQueries.createSchedule, values);
+    const [scheduleResult] = await conn.query(
+      scheduleQueries.createSchedule,
+      values
+    );
+
+    if (scheduleResult.affectedRows === 0) {
+      throw new CustomError("일정 등록 실패", StatusCodes.BAD_REQUEST);
+    }
 
     if (isAttendance) {
-      const [memberResult] = await conn.query(memberQueries.getMembers, roomId);
-
-      memberResult.forEach((member) => {
-        if (member.alarm && member.fcm_token) {
-          createAttendanceAlarm(
-            member.fcm_token,
-            dateTime,
-            member.room_title,
-            title
-          );
-        }
-      });
-
-      const memberIds = memberResult.map((member) => member.user_id);
-      const [attendanceResult] = await createAttendance(scheduleId, memberIds);
-
-      if (attendanceResult.affectedRows === 0) {
-        throw new CustomError(
-          "출석부 등록에 실패했습니다.",
-          StatusCodes.BAD_REQUEST
-        );
-      }
+      await createMembersAttendance(scheduleId, roomId);
     }
 
     return {
       message: "일정 등록 성공",
-      schedule: {
-        scheduleId,
-        roomId,
-        title,
-        date,
-        time,
-        isAttendance,
-      },
     };
   } catch (err) {
     throw err;
   }
 };
 
-const deleteSchedule = async (userId, scheduleId) => {
+const deleteSchedule = async (roomId, scheduleId) => {
   try {
     const [[scheduleResult]] = await conn.query(
       scheduleQueries.getSchedule,
@@ -85,20 +91,23 @@ const deleteSchedule = async (userId, scheduleId) => {
 
     const isAttendance = scheduleResult.is_attendance;
     if (isAttendance) {
-      const [attendanceResult] = await deleteAttendances(scheduleId);
+      const [members] = await conn.query(memberQueries.getMembers, roomId);
 
-      if (attendanceResult.affectedRows === 0) {
-        throw new CustomError(
-          "출석부 삭제에 실패했습니다.",
-          StatusCodes.BAD_REQUEST
-        );
+      for (let member of members) {
+        if (member.alarm) {
+          const [[{ id }]] = await conn.query(
+            attendanceQueries.getAttendanceId,
+            [member.user_id, scheduleId]
+          );
+          schedule.cancelJob(id);
+        }
       }
     }
 
-    const [deleteResult] = await conn.query(scheduleQueries.deleteSchedule, [
-      scheduleId,
-      userId,
-    ]);
+    const [deleteResult] = await conn.query(
+      scheduleQueries.deleteSchedule,
+      scheduleId
+    );
 
     if (deleteResult.affectedRows === 0) {
       throw new CustomError(
@@ -117,15 +126,21 @@ const deleteSchedule = async (userId, scheduleId) => {
 
 const getSchedule = async (roomId) => {
   try {
-    const schedulesResult = await conn.query(
+    const [schedulesResult] = await conn.query(
       scheduleQueries.getSchedulesByRoomId,
       [roomId]
     );
-    const schedules = schedulesResult[0];
+    const schedules = schedulesResult.map((schedule) => ({
+      scheduleId: schedule.id,
+      title: schedule.title,
+      date: schedule.date.split(" ")[0],
+      time: schedule.date.split(" ")[1],
+      isAttendance: schedule.is_attendance,
+    }));
 
     return {
       message: "일정 조회 성공",
-      schedule: schedules,
+      schedules,
     };
   } catch (err) {
     throw err;
@@ -162,4 +177,5 @@ module.exports = {
   deleteSchedule,
   getSchedule,
   getAttendanceDate,
+  createAttendanceAlarm,
 };

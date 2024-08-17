@@ -9,22 +9,42 @@ const { createAttendance } = require("./attendanceService");
 const { sendPushNotification } = require("../utils/cloudMessaging");
 const attendanceQueries = require("../queries/attendanceQueries");
 
-const createAttendanceAlarm = (
-  userToken,
+const verifyAlarmSchedule = async (attendanceId, userId, roomId) => {
+  const [[{ count }]] = await conn.query(
+    attendanceQueries.getAttendance,
+    attendanceId
+  );
+
+  if (count === 0) return false;
+
+  const [[{ alarm, fcmToken }]] = await conn.query(memberQueries.getAlarmInfo, [
+    userId,
+    roomId,
+  ]);
+
+  if (!alarm || !fcmToken) return false;
+
+  return fcmToken;
+};
+
+const createAttendanceAlarm = async (
   attendanceId,
-  attendanceDate,
-  roomTitle,
-  scheduleTitle
+  userId,
+  roomId,
+  alarmInfo
 ) => {
-  const reminderTime = new Date(attendanceDate - 10 * 60 * 1000);
-  const messageTitle = `${roomTitle} 출석 안내`;
-  const messageBody = `${scheduleTitle} 일정이 10분 전입니다.`;
-  schedule.scheduleJob(attendanceId, reminderTime, () => {
-    sendPushNotification(userToken, messageTitle, messageBody);
+  const reminderTime = new Date(alarmInfo.attendanceDate - 10 * 60 * 1000);
+  const messageTitle = `${alarmInfo.roomTitle} 출석 안내`;
+  const messageBody = `${alarmInfo.scheduleTitle} 일정이 10분 전입니다.`;
+  schedule.scheduleJob(reminderTime, async () => {
+    const userToken = await verifyAlarmSchedule(attendanceId, userId, roomId);
+    if (userToken) {
+      sendPushNotification(userToken, messageTitle, messageBody);
+    }
   });
 };
 
-const createMembersAttendance = async (scheduleId, roomId) => {
+const createMembersAttendance = async (scheduleId, roomId, title, dateTime) => {
   const [memberResult] = await conn.query(memberQueries.getMembers, roomId);
 
   const memberIds = memberResult.map((member) => member.user_id);
@@ -33,17 +53,25 @@ const createMembersAttendance = async (scheduleId, roomId) => {
     memberIds
   );
 
-  memberResult.forEach((member, idx) => {
-    if (member.alarm && member.fcm_token) {
-      createAttendanceAlarm(
-        member.fcm_token,
-        attendanceIds[idx],
-        dateTime,
-        member.room_title,
-        title
-      );
-    }
-  });
+  const members = memberResult.map((member, idx) => ({
+    ...member,
+    attendanceId: attendanceIds[idx],
+  }));
+
+  for (let member of members) {
+    const alarmInfo = {
+      roomTitle: member.room_title,
+      scheduleTitle: title,
+      attendanceDate: dateTime,
+    };
+
+    await createAttendanceAlarm(
+      member.attendanceId,
+      member.user_id,
+      roomId,
+      alarmInfo
+    );
+  }
 
   if (attendanceResult.affectedRows === 0) {
     throw new CustomError("출석부 등록 실패", StatusCodes.BAD_REQUEST);
@@ -66,7 +94,7 @@ const createSchedule = async (roomId, title, date, time, isAttendance) => {
     }
 
     if (isAttendance) {
-      await createMembersAttendance(scheduleId, roomId);
+      await createMembersAttendance(scheduleId, roomId, title, dateTime);
     }
 
     return {
@@ -87,21 +115,6 @@ const deleteSchedule = async (roomId, scheduleId) => {
     // 존재하지 않는 일정 처리
     if (!scheduleResult) {
       throw new CustomError("일정을 찾을 수 없습니다.", StatusCodes.NOT_FOUND);
-    }
-
-    const isAttendance = scheduleResult.is_attendance;
-    if (isAttendance) {
-      const [members] = await conn.query(memberQueries.getMembers, roomId);
-
-      for (let member of members) {
-        if (member.alarm) {
-          const [[{ id }]] = await conn.query(
-            attendanceQueries.getAttendanceId,
-            [member.user_id, scheduleId]
-          );
-          schedule.cancelJob(id);
-        }
-      }
     }
 
     const [deleteResult] = await conn.query(

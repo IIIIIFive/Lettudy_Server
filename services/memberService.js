@@ -5,9 +5,6 @@ const memberQueries = require("../queries/memberQueries");
 const scheduleQueries = require("../queries/scheduleQueries");
 const attendanceQueries = require("../queries/attendanceQueries");
 const roomQueries = require("../queries/roomQueries");
-const { cancelJob } = require("node-schedule");
-const { createAttendanceAlarm } = require("./scheduleService");
-const userQueries = require("../queries/userQueries");
 
 const getProfileNum = async (roomId) => {
   const [profileResult] = await conn.query(
@@ -190,36 +187,6 @@ const updateAlarm = async (userId, roomId, alarm) => {
 
     if (updateAlarmResult.affectedRows === 0) {
       throw new CustomError("알람 변경 실패", StatusCodes.BAD_REQUEST);
-    }
-
-    const [attendances] = await conn.query(
-      attendanceQueries.getAttendancesByRoom,
-      [userId, roomId]
-    );
-
-    const [[{ fcm_token }]] = await conn.query(userQueries.getFCMToken, userId);
-
-    // 이미 등록한 알람 일정 삭제
-    if (fcm_token && !alarm) {
-      attendances.forEach(({ attendnaceId }) => cancelJob(attendnaceId));
-    }
-
-    // 알람 등록
-    if (fcm_token && alarm) {
-      const [[{ title: roomTitle }]] = await conn.query(
-        roomQueries.getRoomById,
-        roomId
-      );
-
-      attendances.forEach((attendance) => {
-        createAttendanceAlarm(
-          fcm_token,
-          attendance.attendanceId,
-          attendance.date,
-          roomTitle,
-          attendance.title
-        );
-      });
     }
 
     return {

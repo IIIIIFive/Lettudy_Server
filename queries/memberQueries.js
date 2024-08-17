@@ -52,6 +52,13 @@ const memberQueries = {
   getAlarmsOff: `
     UPDATE members SET alarm = false WHERE user_id = ?
   `,
+  getAlarmInfo: `
+    SELECT alarm, fcm_token as fcmToken
+    FROM members
+    LEFT JOIN users
+    ON members.user_id = users.id
+    WHERE user_id = ? AND room_id = ?
+  `,
 };
 
 module.exports = memberQueries;

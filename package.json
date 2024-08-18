@@ -1,6 +1,9 @@
 {
   "name": "Lettudy-Server",
   "version": "1.0.0",
+  "engines": {
+    "node": "20.16.0"
+  },
   "description": "",
   "main": "app.js",
   "scripts": {

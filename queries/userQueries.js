@@ -7,7 +7,6 @@ const userQueries = {
   updatePassword: `UPDATE users SET password = ?, salt = ? WHERE id = ?`,
   updateFcmToken: `UPDATE users SET fcm_token = ? WHERE id = ?`,
   deleteFcmToken: `UPDATE users SET fcm_token = NULL WHERE id = ?`,
-  getFCMToken: `SELECT fcm_token FROM users WHERE id = ?`,
   deleteFcmTokenByToken: `UPDATE users SET fcm_token = NULL WHERE fcm_token = ?`,
 };
 

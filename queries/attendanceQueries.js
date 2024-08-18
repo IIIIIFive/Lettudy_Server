@@ -36,6 +36,11 @@ const attendanceQueries = {
     ON schedules.id = attendances.schedule_id
     WHERE user_id = ? AND room_id = ? AND date > NOW()
   `,
+  getAttendance: `
+    SELECT COUNT(*) AS count 
+    FROM attendances 
+    WHERE id = ?
+  `,
 };
 
 module.exports = attendanceQueries;

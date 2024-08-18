@@ -1,7 +1,21 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("../serviceAccountKey.json");
 const conn = require("../utils/db");
 const userQueries = require("../queries/userQueries");
+const settings = require("../settings");
+
+const serviceAccount = {
+  type: settings.FCM_TYPE,
+  project_id: settings.FCM_PROJECT_ID,
+  private_key_id: settings.FCM_PRIVATE_KEY_ID,
+  private_key: settings.FCM_PRIVATE_KEY,
+  client_email: settings.FCM_CLIENT_EMAIL,
+  client_id: settings.FCM_CLIENT_ID,
+  auth_uri: settings.FCM_AUTH_URI,
+  token_uri: settings.FCM_TOKEN_URI,
+  auth_provider_x509_cert_url: settings.FCM_AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: settings.FCM_CLIENT_X509_CERT_URL,
+  universe_domain: settings.FCM_UNIVERSE_DOMAIN,
+};
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

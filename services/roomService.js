@@ -88,7 +88,7 @@ const updateNotice = async (roomId, notice) => {
 const getRoom = async (roomId, userId) => {
   const [[roomResult]] = await conn.query(roomQueries.getRoomById, roomId);
   const { members } = await getMembersRecord(roomId);
-  const { date, time } = await getAttendanceDate(userId, roomId);
+  const { date, time, attendanceId } = await getAttendanceDate(userId, roomId);
   const { records: attendanceRecord } = await getUserAttendances(
     userId,
     roomId
@@ -100,7 +100,7 @@ const getRoom = async (roomId, userId) => {
     ...roomResult,
     notice: JSON.parse(roomResult.notice) || [],
     members,
-    nextAttendance: { date, time },
+    nextAttendance: { attendanceId, date, time },
     attendanceRecord,
     schedules,
   };

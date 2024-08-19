@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const CustomError = require("../utils/CustomError");
 const { StatusCodes } = require("http-status-codes");
 const memberQueries = require("../queries/memberQueries");
+const userQueries = require("../queries/userQueries");
 
 const checkMember = async (userId, roomId) => {
   const memberResult = await conn.query(memberQueries.checkMember, [
@@ -41,6 +42,12 @@ const getChats = async (userId, roomId) => {
     const chatItemsResult = await conn.query(chatQueries.getChatItemsByChatId, [
       chatId,
     ]);
+
+    for (let chatItem of chatItemsResult[0]) {
+      const userId = chatItem.sender;
+      const userResult = await conn.query(userQueries.getNameById, userId);
+      chatItem.sender = userResult[0][0].name;
+    }
 
     return {
       message: "채팅내역 조회 성공",
@@ -80,19 +87,8 @@ const sendMessage = async (userId, roomId, content, type) => {
 
     await conn.query(chatQueries.sendMessage, values);
 
-    const chatData = {
-      sender: userId,
-      chatItemId,
-      chatId,
-      content,
-      type,
-    };
-
-    global.io.to(roomId).emit("chat", chatData);
-
     return {
       message: "채팅 메시지 전송 성공",
-      chat: chatData,
     };
   } catch (err) {
     throw err;

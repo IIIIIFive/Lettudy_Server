@@ -35,74 +35,121 @@ const initSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("New Client connected");
+    const roomId = socket.handshake.query.roomId;
+    const userId = socket.userId;
 
-    // socket.on("chat message", (message) => {
-    //   console.log("message: " + message);
-    //   io.emit("chat message", message);
-    // });
+    if (!roomId) {
+      socket.disconnect();
+      return;
+    }
 
-    socket.on("joinRoom", async (info) => {
-      const { roomId } = info;
-      userId = socket.userId;
+    console.log(`New client connected to room: ${roomId}`);
 
-      console.log("roomId: ", roomId);
-      console.log("userId: ", userId);
+    socket.join(roomId);
 
-      socket.join(roomId);
+    socket.on("chat message", async (message) => {
+      const { content, type } = message;
 
       try {
-        const [userResult] = await conn.query(
-          `SELECT name FROM users WHERE id = ?`,
-          userId
-        );
+        await chatService.sendMessage(userId, roomId, content, type);
 
-        if (userResult.length > 0) {
-          const userName = userResult[0].name;
-          console.log(`${userName} joined room: ${roomId}`);
-
-          io.to(roomId).emit("Join Room", { userId, userName });
-          // socket.to(roomId).emit(`joined Room`, { userId, userName });
-
-          // socket.removeAllListeners("chat message");
-
-          // 메시지 보내기
-          socket.on("chat message", async (message) => {
-            const { content, type } = message;
-
-            console.log("user id: ", userId);
-
-            try {
-              const result = await chatService.sendMessage(
-                userId,
-                roomId,
-                content,
-                type
-              );
-
-              io.to(roomId).emit("chat message", { userName, content });
-            } catch (err) {
-              console.log("Error saving message: ", err);
-              socket.emit("error", { message: err.message });
-            }
-          });
-        } else {
-          throw new CustomError("방이나 사용자를 찾을 수 없습니다.", 404);
-        }
+        io.to(roomId).emit("chat message", content);
       } catch (err) {
-        console.log("Error joining room: ", err);
+        console.log("Error saving message: ", err);
         socket.emit("error", { message: err.message });
       }
     });
 
-    socket.on("disconnect", (reason) => {
-      console.log("Client disconnected:", reason);
-    });
-
-    socket.on("error", (error) => {
-      console.error("Socket error:", error);
+    socket.on("disconnect", () => {
+      console.log(`Client disconnected from room: ${roomId}`);
     });
   });
+
+  // io.on("connection", (socket) => {
+  //   console.log("New Client connected");
+
+  //   // socket.on("chat message", (message) => {
+  //   //   console.log("message: " + message);
+  //   //   io.emit("chat message", message);
+  //   // });
+
+  //   socket.on("joinRoom", async (info) => {
+  //     const { roomId } = info;
+  //     userId = socket.userId;
+
+  //     console.log("roomId: ", roomId);
+  //     console.log("userId: ", userId);
+
+  //     socket.join(roomId);
+
+  //     try {
+  //       const [userResult] = await conn.query(
+  //         `SELECT name FROM users WHERE id = ?`,
+  //         userId
+  //       );
+
+  //       if (userResult.length > 0) {
+  //         const userName = userResult[0].name;
+  //         console.log(`${userName} joined room: ${roomId}`);
+
+  //         if (!roomUsers[roomId]) {
+  //           roomUsers[roomId] = [];
+  //         }
+  //         roomUsers[roomId].push({ userId, userName });
+
+  //         // io.to(roomId).emit("Join Room", { userId, userName });
+  //         socket.to(roomId).emit(`joined Room`, { userId, userName });
+
+  //         // socket.removeAllListeners("chat message");
+
+  //         // 메시지 보내기
+  //         socket.on("chat message", async (message) => {
+  //           const { content, type } = message;
+
+  //           console.log("user id: ", userId);
+
+  //           try {
+  //             const result = await chatService.sendMessage(
+  //               userId,
+  //               roomId,
+  //               content,
+  //               type
+  //             );
+
+  //             io.to(roomId).emit("chat message", { userName, content });
+  //           } catch (err) {
+  //             console.log("Error saving message: ", err);
+  //             socket.emit("error", { message: err.message });
+  //           }
+  //         });
+  //       } else {
+  //         throw new CustomError("방이나 사용자를 찾을 수 없습니다.", 404);
+  //       }
+  //     } catch (err) {
+  //       console.log("Error joining room: ", err);
+  //       socket.emit("error", { message: err.message });
+  //     }
+  //   });
+
+  //   socket.on("disconnect", (reason) => {
+  //     const { roomId, userId } = socket;
+
+  //     if (roomUsers[roomId]) {
+  //       roomUsers[roomId] = roomUsers[roomId].filter(
+  //         (user) => user.userId !== userId
+  //       );
+
+  //       if (roomUsers[roomId].length === 0) {
+  //         delete roomUsers[roomId];
+  //       }
+  //     }
+  //     console.log("Client disconnected:", reason);
+  //   });
+
+  //   socket.on("error", (error) => {
+  //     console.error("Socket error:", error);
+  //   });
+  // });
 };
 
 module.exports = initSocket;

@@ -5,7 +5,7 @@ const { PORT } = require("./settings");
 const initSocket = require("./sockets/chatSocket");
 
 const app = express();
-const port = PORT || 7777;
+const port = PORT || 5000;
 
 app.use(express.json());
 

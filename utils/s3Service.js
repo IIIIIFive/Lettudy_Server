@@ -16,7 +16,7 @@ const uploadImageToS3 = (file) => {
     const key = `${uuidv4()}${fileExtension}`;
 
     const params = {
-      Bucket: process.env.S3_BUCKET_NAME,
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,

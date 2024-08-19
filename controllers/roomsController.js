@@ -42,6 +42,13 @@ const updateNotice = async (req, res) => {
     const roomId = req.roomId;
     const { notice } = req.body;
 
+    if (!Array.isArray(notice)) {
+      throw new CustomError(
+        "요청 형식을 확인해주세요",
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
     const result = await roomService.updateNotice(roomId, notice);
 
     return res.status(StatusCodes.OK).json(result);

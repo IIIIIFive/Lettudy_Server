@@ -71,7 +71,7 @@ const getRooms = async (userId) => {
 const updateNotice = async (roomId, notice) => {
   try {
     const [noticeResult] = await conn.query(roomQueries.updateNotice, [
-      notice,
+      JSON.stringify(notice),
       roomId,
     ]);
 
@@ -98,6 +98,7 @@ const getRoom = async (roomId, userId) => {
   return {
     message: "스터디 조회 성공",
     ...roomResult,
+    notice: JSON.parse(roomResult.notice) || [],
     members,
     nextAttendance: { date, time },
     attendanceRecord,

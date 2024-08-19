@@ -16,6 +16,20 @@ const createNote = async (req, res) => {
   }
 };
 
+const createPreSigned = async (req, res) => {
+  try {
+    const roomId = req.roomId;
+    const { fileName } = req.body;
+    const result = await noteService.createPreSigned(roomId, fileName);
+
+    return res.status(StatusCodes.OK).json(result);
+  } catch (err) {
+    res.status(err.statusCode || 500).json({
+      message: err.message,
+    });
+  }
+};
+
 const getNotes = async (req, res) => {
   try {
     const roomId = req.roomId;
@@ -84,6 +98,7 @@ const deleteNote = async (req, res) => {
 
 module.exports = {
   createNote,
+  createPreSigned,
   getNotes,
   updateNote,
   deleteNote,

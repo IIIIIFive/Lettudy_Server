@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const noteQueries = require("../queries/noteQueries");
 const CustomError = require("../utils/CustomError");
 const tagQueries = require("../queries/tagQueries");
+const { getPreSignedUrl } = require("../utils/s3Service");
 
 const addNote = async (roomId, title, content) => {
   try {
@@ -184,10 +185,26 @@ const deleteNote = async (noteId) => {
   }
 };
 
+const createPreSigned = async (roomId, fileName) => {
+  try {
+    const filePath = `${roomId}/${Date.now() + fileName}`;
+    const preSignedUrl = await getPreSignedUrl(filePath);
+
+    return {
+      message: "url 발급 성공",
+      preSignedUrl,
+      fileName: filePath,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
   createNote,
   getNotes,
   updateNote,
   deleteNote,
   getNoteContent,
+  createPreSigned,
 };

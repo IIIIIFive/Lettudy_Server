@@ -5,9 +5,15 @@ const CustomError = require("../utils/CustomError");
 const createNote = async (req, res) => {
   try {
     const roomId = req.roomId;
-    const { title, content, tags } = req.body;
+    const { title, content, images, tags } = req.body;
 
-    const result = await noteService.createNote(roomId, title, content, tags);
+    const result = await noteService.createNote(
+      roomId,
+      title,
+      content,
+      images,
+      tags
+    );
     return res.status(StatusCodes.CREATED).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({
@@ -33,18 +39,8 @@ const createPreSigned = async (req, res) => {
 const getNotes = async (req, res) => {
   try {
     const roomId = req.roomId;
-    let { tag, limit, currentPage } = req.query;
-    limit = parseInt(limit);
-    currentPage = parseInt(currentPage);
-    const tags = tag?.split(",") || [];
 
-    if (!limit || !currentPage) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "잘못된 url 형식입니다.",
-      });
-    }
-
-    const result = await noteService.getNotes(roomId, tags, limit, currentPage);
+    const result = await noteService.getNotes(roomId);
     return res.status(StatusCodes.OK).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({
@@ -69,12 +65,18 @@ const getNoteContent = async (req, res) => {
 const updateNote = async (req, res) => {
   try {
     const { noteId } = req.params;
-    let { title, content, tags } = req.body;
-    if (!title || !content || !tags) {
+    let { title, content, images, tags } = req.body;
+    if (!title || !content || !tags || !images) {
       throw new CustomError("요청값을 확인해주세요", StatusCodes.BAD_REQUEST);
     }
 
-    const result = await noteService.updateNote(noteId, title, content, tags);
+    const result = await noteService.updateNote(
+      noteId,
+      title,
+      content,
+      images,
+      tags
+    );
     return res.status(StatusCodes.OK).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({

@@ -7,7 +7,7 @@ const serviceAccount = {
   type: settings.FCM_TYPE,
   project_id: settings.FCM_PROJECT_ID,
   private_key_id: settings.FCM_PRIVATE_KEY_ID,
-  private_key: settings.FCM_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  private_key: settings.FCM_PRIVATE_KEY.replace(/\\\\n/g, "\n"),
   client_email: settings.FCM_CLIENT_EMAIL,
   client_id: settings.FCM_CLIENT_ID,
   auth_uri: settings.FCM_AUTH_URI,

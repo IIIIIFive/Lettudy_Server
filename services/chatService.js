@@ -47,6 +47,11 @@ const getChats = async (userId, roomId) => {
       const userId = chatItem.sender;
       const userResult = await conn.query(userQueries.getNameById, userId);
       chatItem.sender = userResult[0][0].name;
+      const profileNum = await conn.query(memberQueries.getProfileNumByUserId, [
+        userId,
+        roomId,
+      ]);
+      chatItem.profileNum = profileNum[0][0].profile_num;
     }
 
     return {
@@ -95,66 +100,8 @@ const sendMessage = async (userId, roomId, content, type) => {
   }
 };
 
-const sendImage = async (file, userId, roomId) => {
-  try {
-    if (!file) {
-      throw new CustomError(
-        "파일이 존재하지 않습니다.",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-
-    // 일단 파일로 대체
-    const imageUrl = file;
-    return sendMessage(userId, roomId, imageUrl, "image");
-  } catch (err) {
-    throw err;
-  }
-};
-
-const deleteMessage = async (userId, roomId, chatItemId) => {
-  try {
-    // 해당 스터디방에 가입된 회원인지 확인
-    await checkMember(userId, roomId);
-
-    // 채팅방 찾기
-    const chatRoomResult = await conn.query(chatQueries.getChatIdByRoomId, [
-      roomId,
-    ]);
-
-    if (chatRoomResult[0].length === 0) {
-      throw new CustomError(
-        "채팅방을 찾을 수 없습니다.",
-        StatusCodes.NOT_FOUND
-      );
-    }
-
-    const chatId = chatRoomResult[0][0].id;
-    const deleteResult = await conn.query(chatQueries.deleteMessage, [
-      chatItemId,
-      chatId,
-      userId,
-    ]);
-
-    if (deleteResult[0].affectedRows === 0) {
-      throw new CustomError(
-        "메시지를 삭제할 수 없습니다.",
-        StatusCodes.NOT_FOUND
-      );
-    }
-
-    return {
-      message: "채팅 메시지 삭제 성공",
-    };
-  } catch (err) {
-    throw err;
-  }
-};
-
 module.exports = {
   checkMember,
   getChats,
   sendMessage,
-  sendImage,
-  deleteMessage,
 };

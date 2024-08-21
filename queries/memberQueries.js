@@ -59,6 +59,7 @@ const memberQueries = {
     ON members.user_id = users.id
     WHERE user_id = ? AND room_id = ?
   `,
+  getProfileNumByUserId: `SELECT profile_num FROM members WHERE user_id = ? AND room_id = ?`,
 };
 
 module.exports = memberQueries;

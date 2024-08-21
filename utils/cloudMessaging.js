@@ -3,6 +3,9 @@ const conn = require("../utils/db");
 const userQueries = require("../queries/userQueries");
 const settings = require("../settings");
 
+console.log(settings.FCM_PRIVATE_KEY.replace(/\/n/g, "\n"));
+console.log("그냥 환경 변수만 \n");
+console.log(settings.FCM_PRIVATE_KEY);
 const serviceAccount = {
   type: settings.FCM_TYPE,
   project_id: settings.FCM_PROJECT_ID,

@@ -33,11 +33,13 @@ const createAttendanceAlarm = async (
   roomId,
   alarmInfo
 ) => {
+  console.log("알람 생성");
   const reminderTime = new Date(alarmInfo.attendanceDate - 10 * 60 * 1000);
   const messageTitle = `${alarmInfo.roomTitle} 출석 안내`;
   const messageBody = `${alarmInfo.scheduleTitle} 일정이 10분 전입니다.`;
   schedule.scheduleJob(reminderTime, async () => {
     const userToken = await verifyAlarmSchedule(attendanceId, userId, roomId);
+    console.log(`userToken: ${userToken}`);
     if (userToken) {
       sendPushNotification(userToken, messageTitle, messageBody);
     }

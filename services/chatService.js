@@ -64,7 +64,7 @@ const getChats = async (userId, roomId) => {
   }
 };
 
-const sendMessage = async (userId, roomId, content, type) => {
+const sendMessage = async (userId, roomId, content) => {
   try {
     // 해당 스터디방에 가입된 회원인지 확인
     await checkMember(userId, roomId);
@@ -82,13 +82,7 @@ const sendMessage = async (userId, roomId, content, type) => {
 
     const chatId = chatIdResult[0][0].id;
     const chatItemId = uuidv4();
-    const values = [
-      chatItemId,
-      chatId,
-      userId,
-      content,
-      type === "image" ? content : null,
-    ];
+    const values = [chatItemId, chatId, userId, content];
 
     await conn.query(chatQueries.sendMessage, values);
 

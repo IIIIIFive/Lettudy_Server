@@ -21,9 +21,9 @@ const sendMessage = async (req, res) => {
   try {
     const userId = req.userId;
     const { roomId } = req.params;
-    const { content, type } = req.body;
+    const { content } = req.body;
 
-    const result = await chatService.sendMessage(userId, roomId, content, type);
+    const result = await chatService.sendMessage(userId, roomId, content);
     res.status(StatusCodes.CREATED).json(result);
   } catch (err) {
     res.status(err.statusCode || 500).json({

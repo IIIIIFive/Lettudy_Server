@@ -8,6 +8,11 @@ const chatQueries = {
     WHERE chat_id = ?
     ORDER BY created_at ASC`,
   deleteMessage: `DELETE FROM chat_items WHERE id = ? AND chat_id = ? AND user_id = ?`,
+  getCreatedAt: `
+    SELECT created_at FROM chat_items
+    WHERE chat_id = ? AND user_id = ?
+    ORDER BY created_at DESC
+    LIMIT 1`,
 };
 
 module.exports = chatQueries;

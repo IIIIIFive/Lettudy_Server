@@ -3,10 +3,27 @@ const scheduleRouter = express.Router();
 const schedulesController = require("../controllers/schedulesController");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
 const { validate } = require("../middlewares/validator");
+const {
+  createIdChain: createIdParamChain,
+  createIsAttendanceChain,
+} = require("../utils/paramValidations");
+const {
+  createIdChain: createIdBodyChain,
+  createStringWithLimitChain,
+  createDateChain,
+  createTimeChain,
+  createBooleanChain,
+} = require("../utils/bodyValidations");
 
 scheduleRouter.post(
   "/",
-  validate([]),
+  validate([
+    createIdBodyChain("roomId"),
+    createStringWithLimitChain("title", 100),
+    createDateChain(),
+    createTimeChain(),
+    createBooleanChain("isAttendance"),
+  ]),
   verifyToken,
   authorizeUser,
   schedulesController.createSchedule
@@ -14,7 +31,10 @@ scheduleRouter.post(
 
 scheduleRouter.delete(
   "/:roomId/:scheduleId",
-  validate([]),
+  validate([
+    createIdParamChain("roomId", 36),
+    createIdParamChain("scheduleId", 36),
+  ]),
   verifyToken,
   authorizeUser,
   schedulesController.deleteSchedule
@@ -22,7 +42,7 @@ scheduleRouter.delete(
 
 scheduleRouter.get(
   "/:roomId",
-  validate([]),
+  validate([createIdParamChain("roomId", 36), createIsAttendanceChain()]),
   verifyToken,
   authorizeUser,
   schedulesController.getSchedule

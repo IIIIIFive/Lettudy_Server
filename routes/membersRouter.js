@@ -7,28 +7,35 @@ const {
   updateAlarm,
 } = require("../controllers/membersController");
 const { validate } = require("../middlewares/validator");
+const { createIdChain } = require("../utils/paramValidations");
+const { createBooleanChain } = require("../utils/bodyValidations");
 
 const memberRouter = express.Router();
 
-memberRouter.post("/:roomCode", validate([]), verifyToken, createMember);
+memberRouter.post(
+  "/:roomCode",
+  validate([createIdChain("roomCode", 6)]),
+  verifyToken,
+  createMember
+);
 
 memberRouter.delete(
   "/:roomId",
-  validate([]),
+  validate([createIdChain("roomId", 36)]),
   verifyToken,
   authorizeUser,
   deleteMember
 );
 memberRouter.get(
   "/:roomId",
-  validate([]),
+  validate([createIdChain("roomId", 36)]),
   verifyToken,
   authorizeUser,
   getMembersRecord
 );
 memberRouter.put(
   "/:roomId/alarm",
-  validate([]),
+  validate([createIdChain("roomId", 36), createBooleanChain("alarm")]),
   verifyToken,
   authorizeUser,
   updateAlarm

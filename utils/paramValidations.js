@@ -4,7 +4,7 @@ const createIdChain = (paramName, limit) =>
   param(paramName)
     .notEmpty()
     .escape()
-    .isLength(limit)
+    .isLength({ min: limit, max: limit })
     .withMessage(`${paramName}가 유효하지 않습니다.`);
 
 const createIsAttendanceChain = () =>

@@ -66,9 +66,6 @@ const updateNote = async (req, res) => {
   try {
     const { noteId } = req.params;
     let { title, content, images, tags } = req.body;
-    if (!title || !content || !tags || !images) {
-      throw new CustomError("요청값을 확인해주세요", StatusCodes.BAD_REQUEST);
-    }
 
     const result = await noteService.updateNote(
       noteId,

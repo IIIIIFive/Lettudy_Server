@@ -1,17 +1,21 @@
 const express = require("express");
-const multer = require("multer");
 const chatRouter = express.Router();
 const chatsController = require("../controllers/chatsController");
 const { verifyToken } = require("../middlewares/auth");
 const { validate } = require("../middlewares/validator");
+const { createIdChain } = require("../utils/paramValidations");
+const { createStringChain } = require("../utils/bodyValidations");
 
-const upload = multer();
-
-chatRouter.get("/:roomId", validate([]), verifyToken, chatsController.getChats);
+chatRouter.get(
+  "/:roomId",
+  validate([createIdChain("roomId", 36)]),
+  verifyToken,
+  chatsController.getChats
+);
 
 chatRouter.post(
   "/:roomId/message",
-  validate([]),
+  validate([createIdChain("roomId", 36), createStringChain("content")]),
   verifyToken,
   chatsController.sendMessage
 );

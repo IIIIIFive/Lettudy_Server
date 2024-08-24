@@ -7,12 +7,6 @@ const createSchedule = async (req, res) => {
     const roomId = req.roomId;
     const { title, date, time, isAttendance } = req.body;
 
-    if (!title || !date || !time || isAttendance === undefined) {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        message: "요청값을 확인해주세요",
-      });
-    }
-
     const result = await scheduleService.createSchedule(
       roomId,
       title,
@@ -32,7 +26,6 @@ const createSchedule = async (req, res) => {
 // 일정 삭제
 const deleteSchedule = async (req, res) => {
   try {
-    const userId = req.userId;
     const roomId = req.roomId;
 
     const { scheduleId } = req.params;

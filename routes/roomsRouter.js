@@ -6,10 +6,21 @@ const {
   updateNotice,
   getRoom,
 } = require("../controllers/roomsController");
+const { validate } = require("../middlewares/validator");
+
 const roomRouter = express.Router();
 
-roomRouter.post("/", verifyToken, createRoom); // 방 생성
-roomRouter.get("/", verifyToken, getRooms); // 가입한 방 조회
-roomRouter.put("/:roomId/notice", verifyToken, authorizeUser, updateNotice); // 공지 등록
-roomRouter.get("/:roomId", verifyToken, authorizeUser, getRoom);
+roomRouter.post("/", validate([]), verifyToken, createRoom);
+
+roomRouter.get("/", verifyToken, getRooms);
+
+roomRouter.put(
+  "/:roomId/notice",
+  validate([]),
+  verifyToken,
+  authorizeUser,
+  updateNotice
+);
+
+roomRouter.get("/:roomId", validate([]), verifyToken, authorizeUser, getRoom);
 module.exports = roomRouter;

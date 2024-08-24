@@ -5,9 +5,11 @@ const {
   updateAttendanceStatus,
   getUserAttendances,
 } = require("../controllers/attendancesController");
+const { validate } = require("../middlewares/validator");
 
 attendanceRouter.put(
   "/:roomId",
+  validate([]),
   verifyToken,
   authorizeUser,
   updateAttendanceStatus
@@ -15,6 +17,7 @@ attendanceRouter.put(
 
 attendanceRouter.get(
   "/:roomId",
+  validate([]),
   verifyToken,
   authorizeUser,
   getUserAttendances

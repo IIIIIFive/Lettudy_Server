@@ -1,14 +1,11 @@
 const { StatusCodes } = require("http-status-codes");
 const attendanceService = require("../services/attendanceService");
-const CustomError = require("../utils/CustomError");
 
 const updateAttendanceStatus = async (req, res) => {
   try {
     const userId = req.userId;
     const { attendanceId } = req.body;
-    if (!attendanceId) {
-      throw new CustomError("출석 id가 필요합니다", StatusCodes.BAD_REQUEST);
-    }
+
     const result = await attendanceService.updateAttendanceStatus(
       userId,
       attendanceId

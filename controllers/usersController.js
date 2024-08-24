@@ -77,13 +77,6 @@ const updateFcmToken = async (req, res) => {
     const userId = req.userId;
     const { fcmToken } = req.body;
 
-    if (!fcmToken) {
-      throw new CustomError(
-        "fcm 토큰이 없습니다. 요청값을 확인해주세요",
-        StatusCodes.BAD_REQUEST
-      );
-    }
-
     const result = await userService.updateFcmToken(userId, fcmToken);
 
     res.status(StatusCodes.OK).json(result);

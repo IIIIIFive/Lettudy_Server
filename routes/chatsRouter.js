@@ -3,10 +3,16 @@ const multer = require("multer");
 const chatRouter = express.Router();
 const chatsController = require("../controllers/chatsController");
 const { verifyToken } = require("../middlewares/auth");
+const { validate } = require("../middlewares/validator");
 
 const upload = multer();
 
-chatRouter.get("/:roomId", verifyToken, chatsController.getChats); // 채팅 내역 조회
-chatRouter.post("/:roomId/message", verifyToken, chatsController.sendMessage); // 채팅 메시지 보내기
+chatRouter.get("/:roomId", validate([]), verifyToken, chatsController.getChats);
 
+chatRouter.post(
+  "/:roomId/message",
+  validate([]),
+  verifyToken,
+  chatsController.sendMessage
+);
 module.exports = chatRouter;

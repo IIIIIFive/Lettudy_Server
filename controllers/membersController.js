@@ -49,10 +49,6 @@ const updateAlarm = async (req, res) => {
     const userId = req.userId;
     const { alarm } = req.body;
 
-    if (alarm === undefined) {
-      throw new CustomError("요청값을 확인해주세요.", StatusCodes.BAD_REQUEST);
-    }
-
     const result = await memberService.updateAlarm(userId, roomId, alarm);
 
     return res.status(StatusCodes.OK).json(result);

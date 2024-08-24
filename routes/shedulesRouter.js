@@ -2,16 +2,19 @@ const express = require("express");
 const scheduleRouter = express.Router();
 const schedulesController = require("../controllers/schedulesController");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
+const { validate } = require("../middlewares/validator");
 
 scheduleRouter.post(
   "/",
+  validate([]),
   verifyToken,
   authorizeUser,
   schedulesController.createSchedule
-); // 일정 등록
+);
 
 scheduleRouter.delete(
   "/:roomId/:scheduleId",
+  validate([]),
   verifyToken,
   authorizeUser,
   schedulesController.deleteSchedule
@@ -19,6 +22,7 @@ scheduleRouter.delete(
 
 scheduleRouter.get(
   "/:roomId",
+  validate([]),
   verifyToken,
   authorizeUser,
   schedulesController.getSchedule

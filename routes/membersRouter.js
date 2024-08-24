@@ -6,12 +6,32 @@ const {
   deleteMember,
   updateAlarm,
 } = require("../controllers/membersController");
+const { validate } = require("../middlewares/validator");
 
 const memberRouter = express.Router();
 
-memberRouter.post("/:roomCode", verifyToken, createMember); // 멤버로 방 입장하기
-memberRouter.delete("/:roomId", verifyToken, authorizeUser, deleteMember);
-memberRouter.get("/:roomId", verifyToken, authorizeUser, getMembersRecord);
-memberRouter.put("/:roomId/alarm", verifyToken, authorizeUser, updateAlarm);
+memberRouter.post("/:roomCode", validate([]), verifyToken, createMember);
+
+memberRouter.delete(
+  "/:roomId",
+  validate([]),
+  verifyToken,
+  authorizeUser,
+  deleteMember
+);
+memberRouter.get(
+  "/:roomId",
+  validate([]),
+  verifyToken,
+  authorizeUser,
+  getMembersRecord
+);
+memberRouter.put(
+  "/:roomId/alarm",
+  validate([]),
+  verifyToken,
+  authorizeUser,
+  updateAlarm
+);
 
 module.exports = memberRouter;

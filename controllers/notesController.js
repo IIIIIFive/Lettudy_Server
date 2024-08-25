@@ -1,6 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
 const noteService = require("../services/noteService");
-const CustomError = require("../utils/CustomError");
 
 const createNote = async (req, res) => {
   try {

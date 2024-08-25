@@ -1,11 +1,10 @@
 const conn = require("../utils/db");
 const linkQueries = require("../queries/linkQueries");
-const memberQueries = require("../queries/memberQueries");
 const { v4: uuidv4 } = require("uuid");
 const { StatusCodes } = require("http-status-codes");
 const CustomError = require("../utils/CustomError");
 
-const createLink = async (roomId, userId, title, link) => {
+const createLink = async (roomId, title, link) => {
   try {
     const linkId = uuidv4();
     const [createResult] = await conn.query(linkQueries.createLink, [

@@ -1,14 +1,13 @@
 const linkService = require("../services/linkService");
 const { StatusCodes } = require("http-status-codes");
 
-// 자료 등록
 const createLink = async (req, res) => {
   try {
     const userId = req.userId;
     const roomId = req.roomId;
     const { title, link } = req.body;
 
-    const result = await linkService.createLink(roomId, userId, title, link);
+    const result = await linkService.createLink(roomId, title, link);
 
     res.status(StatusCodes.CREATED).json(result);
   } catch (err) {
@@ -18,7 +17,6 @@ const createLink = async (req, res) => {
   }
 };
 
-// 자료 조회
 const getLinks = async (req, res) => {
   try {
     const roomId = req.roomId;
@@ -33,7 +31,6 @@ const getLinks = async (req, res) => {
   }
 };
 
-// 자료 삭제
 const deleteLink = async (req, res) => {
   try {
     const { linkId } = req.params;

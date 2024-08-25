@@ -1,13 +1,14 @@
 const express = require("express");
-const linkRouter = express.Router();
-const linkController = require("../controllers/linksController");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
 const { validate } = require("../middlewares/validator");
+const linkController = require("../controllers/linksController");
 const { createIdChain } = require("../utils/paramValidations");
 const {
   createStringWithLimitChain,
   createStringChain,
 } = require("../utils/bodyValidations");
+
+const linkRouter = express.Router();
 
 linkRouter.post(
   "/:roomId",

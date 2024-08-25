@@ -1,5 +1,6 @@
 const express = require("express");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
+const { validate } = require("../middlewares/validator");
 const {
   createNote,
   getNotes,
@@ -8,7 +9,6 @@ const {
   getNoteContent,
   createPreSigned,
 } = require("../controllers/notesController");
-const { validate } = require("../middlewares/validator");
 const {
   createIdChain: createIdParamChain,
 } = require("../utils/paramValidations");

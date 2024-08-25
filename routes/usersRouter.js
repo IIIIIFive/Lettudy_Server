@@ -1,13 +1,14 @@
 const express = require("express");
-const userRouter = express.Router();
-const userController = require("../controllers/usersController");
 const { verifyToken } = require("../middlewares/auth");
 const { validate } = require("../middlewares/validator");
+const userController = require("../controllers/usersController");
 const {
   createEmailChain,
   createStringWithLimitChain,
   createStringChain,
 } = require("../utils/bodyValidations");
+
+const userRouter = express.Router();
 
 userRouter.post(
   "/join",

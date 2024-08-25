@@ -34,15 +34,13 @@ const deleteRoom = async (roomId) => {
 
 const getRoomByCode = async (code) => {
   try {
-    const [[getIdResult]] = await conn.query(roomQueries.getIdByCode, code);
-    if (!getIdResult) {
+    const [[room]] = await conn.query(roomQueries.getRoomByCode, code);
+    if (!room) {
       throw new CustomError(
         "유효하지 않은 스터디 코드입니다.",
         StatusCodes.BAD_REQUEST
       );
     }
-
-    const [[room]] = await conn.query(roomQueries.getRoomById, getIdResult.id);
 
     return room;
   } catch (err) {
@@ -58,6 +56,7 @@ const createMember = async (userId, code) => {
       memberQueries.getMembersCount,
       room.roomId
     );
+
     if (count != 0) {
       throw new CustomError(
         "이미 가입된 스터디입니다.",
@@ -71,6 +70,7 @@ const createMember = async (userId, code) => {
         StatusCodes.FORBIDDEN
       );
     }
+
     const profileNum = await getProfileNum(room.roomId);
     const values = [userId, room.roomId, profileNum];
 
@@ -110,13 +110,10 @@ const getMembersRecord = async (roomId) => {
     );
 
     if (totalCount === 0) {
-      const [memberResult] = await conn.query(
-        memberQueries.getMembersName,
-        roomId
-      );
+      const [members] = await conn.query(memberQueries.getMembersName, roomId);
 
       return {
-        members: memberResult.map((member) => ({
+        members: members.map((member) => ({
           name: member.name,
           profileNum: member.profile_num,
           attendanceRate: 100,
@@ -124,14 +121,24 @@ const getMembersRecord = async (roomId) => {
       };
     }
 
+    const [members] = await conn.query(memberQueries.getMembersName, roomId);
+
     const [memberResult] = await conn.query(
       memberQueries.getMembersAttendanceCount,
-      [roomId]
+      [roomId, roomId]
     );
+
+    members.forEach((member) => {
+      const countInfo = memberResult.find(
+        ({ profile_num }) => profile_num === member.profile_num
+      );
+
+      member.count = countInfo?.count || 0;
+    });
 
     return {
       message: "멤버 출석률 조회 성공",
-      members: memberResult.map((member) => ({
+      members: members.map((member) => ({
         name: member.name,
         profileNum: member.profile_num,
         attendanceRate: Math.round((member.count * 100) / totalCount),

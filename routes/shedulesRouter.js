@@ -1,8 +1,7 @@
 const express = require("express");
-const scheduleRouter = express.Router();
-const schedulesController = require("../controllers/schedulesController");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
 const { validate } = require("../middlewares/validator");
+const schedulesController = require("../controllers/schedulesController");
 const {
   createIdChain: createIdParamChain,
   createIsAttendanceChain,
@@ -14,6 +13,8 @@ const {
   createTimeChain,
   createBooleanChain,
 } = require("../utils/bodyValidations");
+
+const scheduleRouter = express.Router();
 
 scheduleRouter.post(
   "/",
@@ -38,7 +39,7 @@ scheduleRouter.delete(
   verifyToken,
   authorizeUser,
   schedulesController.deleteSchedule
-); // 일정 삭제
+);
 
 scheduleRouter.get(
   "/:roomId",
@@ -46,6 +47,6 @@ scheduleRouter.get(
   verifyToken,
   authorizeUser,
   schedulesController.getSchedule
-); // 일정(출석날짜) 조회
+);
 
 module.exports = scheduleRouter;

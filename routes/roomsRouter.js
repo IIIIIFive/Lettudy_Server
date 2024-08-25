@@ -1,12 +1,12 @@
 const express = require("express");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
+const { validate } = require("../middlewares/validator");
 const {
   createRoom,
   getRooms,
   updateNotice,
   getRoom,
 } = require("../controllers/roomsController");
-const { validate } = require("../middlewares/validator");
 const {
   createStringWithLimitChain,
   createArrayChain,

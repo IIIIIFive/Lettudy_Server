@@ -1,8 +1,6 @@
 const userService = require("../services/userService");
 const { StatusCodes } = require("http-status-codes");
-const CustomError = require("../utils/CustomError");
 
-// 회원가입
 const join = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -16,7 +14,6 @@ const join = async (req, res) => {
   }
 };
 
-// 로그인
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -30,7 +27,6 @@ const login = async (req, res) => {
   }
 };
 
-// 회원탈퇴
 const deleteUser = async (req, res) => {
   try {
     const userId = req.userId;
@@ -44,7 +40,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// 이메일 중복확인
 const checkEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -58,7 +53,6 @@ const checkEmail = async (req, res) => {
   }
 };
 
-// 마이페이지 회원 조회
 const getMyPage = async (req, res) => {
   try {
     const userId = req.userId;

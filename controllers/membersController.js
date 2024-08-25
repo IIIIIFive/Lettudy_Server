@@ -1,6 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
 const memberService = require("../services/memberService");
-const CustomError = require("../utils/CustomError");
 
 const createMember = async (req, res) => {
   try {

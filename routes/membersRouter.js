@@ -1,12 +1,12 @@
 const express = require("express");
 const { verifyToken, authorizeUser } = require("../middlewares/auth");
+const { validate } = require("../middlewares/validator");
 const {
   createMember,
   getMembersRecord,
   deleteMember,
   updateAlarm,
 } = require("../controllers/membersController");
-const { validate } = require("../middlewares/validator");
 const { createIdChain } = require("../utils/paramValidations");
 const { createBooleanChain } = require("../utils/bodyValidations");
 

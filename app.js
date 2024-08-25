@@ -34,7 +34,6 @@ const attendanceRouter = require("./routes/attendancesRouter");
 const noteRouter = require("./routes/notesRouter");
 const tagRouter = require("./routes/tagsRouter");
 const linkRouter = require("./routes/linksRouter");
-const { join } = require("path");
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);

@@ -6,27 +6,8 @@ const { StatusCodes } = require("http-status-codes");
 const memberQueries = require("../queries/memberQueries");
 const userQueries = require("../queries/userQueries");
 
-const checkMember = async (userId, roomId) => {
-  const memberResult = await conn.query(memberQueries.checkMember, [
-    roomId,
-    userId,
-  ]);
-
-  console.log("checkMember Query Result: ", memberResult[0][0]);
-
-  if (memberResult[0][0].count === 0) {
-    throw new CustomError(
-      "해당 스터디에 가입되어 있지 않은 회원입니다.",
-      StatusCodes.FORBIDDEN
-    );
-  }
-};
-
-const getChats = async (userId, roomId) => {
+const getChats = async (roomId) => {
   try {
-    // 해당 스터디방에 가입된 회원인지 확인
-    await checkMember(userId, roomId);
-
     const chatsResult = await conn.query(chatQueries.getChatIdByRoomId, [
       roomId,
     ]);
@@ -66,9 +47,6 @@ const getChats = async (userId, roomId) => {
 
 const sendMessage = async (userId, roomId, content) => {
   try {
-    // 해당 스터디방에 가입된 회원인지 확인
-    await checkMember(userId, roomId);
-
     const chatIdResult = await conn.query(chatQueries.getChatIdByRoomId, [
       roomId,
     ]);
@@ -95,7 +73,6 @@ const sendMessage = async (userId, roomId, content) => {
 };
 
 module.exports = {
-  checkMember,
   getChats,
   sendMessage,
 };

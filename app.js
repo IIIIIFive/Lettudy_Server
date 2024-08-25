@@ -24,10 +24,6 @@ app.get("/", (req, res) => {
   res.status(200).send("Lettudy Server");
 });
 
-app.get("/html", (req, res) => {
-  res.sendFile(join(__dirname, "/index.html"));
-});
-
 // 라우터 설정
 const userRouter = require("./routes/usersRouter");
 const roomRouter = require("./routes/roomsRouter");
@@ -38,7 +34,6 @@ const attendanceRouter = require("./routes/attendancesRouter");
 const noteRouter = require("./routes/notesRouter");
 const tagRouter = require("./routes/tagsRouter");
 const linkRouter = require("./routes/linksRouter");
-const { join } = require("path");
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);

@@ -46,7 +46,9 @@ const updateAlarm = async (req, res) => {
   try {
     const roomId = req.roomId;
     const userId = req.userId;
-    const { alarm } = req.body;
+    let { alarm } = req.body;
+
+    alarm = alarm ? 1 : 0;
 
     const result = await memberService.updateAlarm(userId, roomId, alarm);
 

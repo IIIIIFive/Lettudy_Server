@@ -20,7 +20,7 @@ const attendanceQueries = {
     FROM attendances
     JOIN schedules
     ON schedules.id = attendances.schedule_id
-    WHERE attendances.user_id = ? AND schedules.room_id = ? AND schedules.date < NOW()
+    WHERE attendances.user_id = ? AND schedules.room_id = ? AND (addtime(schedules.date, "0:20:0") < NOW() OR status=1)
     ORDER BY date DESC
   `,
 

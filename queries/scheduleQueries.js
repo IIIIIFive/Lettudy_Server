@@ -3,7 +3,8 @@ const scheduleQueries = {
 
   deleteSchedule: `DELETE FROM schedules WHERE id = ?`,
 
-  getSchedule: `SELECT * FROM schedules WHERE id = ?`,
+  getSchedule: `
+    SELECT * FROM schedules WHERE id = ?`,
 
   getSchedulesByRoomId: `SELECT * FROM schedules WHERE room_id = ?`,
 
@@ -12,7 +13,7 @@ const scheduleQueries = {
     FROM attendances
     JOIN schedules
     ON attendances.schedule_id = schedules.id
-    WHERE schedules.room_id = ? AND addtime(schedules.date, "0:20:0") > NOW() AND attendances.user_id = ?
+    WHERE schedules.room_id = ? AND attendances.user_id = ? AND addtime(schedules.date, "0:20:0") > NOW() 
     ORDER BY date ASC LIMIT 1
   `,
 

@@ -105,7 +105,7 @@ const createSchedule = async (roomId, title, date, time, isAttendance) => {
   }
 };
 
-const deleteSchedule = async (roomId, scheduleId) => {
+const deleteSchedule = async (scheduleId) => {
   try {
     const [[scheduleResult]] = await conn.query(
       scheduleQueries.getSchedule,

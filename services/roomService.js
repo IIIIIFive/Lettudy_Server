@@ -1,11 +1,11 @@
 const conn = require("../utils/db");
+const crypto = require("crypto");
+const { v4: uuidv4 } = require("uuid");
+const { StatusCodes } = require("http-status-codes");
 const roomQueries = require("../queries/roomQueries");
 const chatQueries = require("../queries/chatQueries");
 const memberQueries = require("../queries/memberQueries");
-const { v4: uuidv4 } = require("uuid");
-const { createCode } = require("../utils/hashedpw");
 const CustomError = require("../utils/CustomError");
-const { StatusCodes } = require("http-status-codes");
 const { getMembersRecord } = require("./memberService");
 const { getAttendanceDate, getSchedule } = require("./scheduleService");
 const { getUserAttendances } = require("./attendanceService");
@@ -15,7 +15,7 @@ const generateUniqueCode = async () => {
   let isUnique = false;
 
   while (!isUnique) {
-    code = createCode();
+    code = crypto.randomBytes(3).toString("hex");
     const [[result]] = await conn.query(roomQueries.checkCode, code);
     isUnique = result.count === 0;
   }

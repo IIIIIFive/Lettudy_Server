@@ -32,6 +32,7 @@ const sendPushNotification = async (token, title, body) => {
 
   try {
     const response = await admin.messaging().send(message);
+    console.log(response);
   } catch (error) {
     if (
       error.code === "messaging/invalid-registration-token" ||

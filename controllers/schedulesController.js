@@ -4,7 +4,9 @@ const scheduleService = require("../services/scheduleService");
 const createSchedule = async (req, res) => {
   try {
     const roomId = req.roomId;
-    const { title, date, time, isAttendance } = req.body;
+    let { title, date, time, isAttendance } = req.body;
+
+    isAttendance = isAttendance ? 1 : 0;
 
     const result = await scheduleService.createSchedule(
       roomId,

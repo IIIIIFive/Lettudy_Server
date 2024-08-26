@@ -197,22 +197,11 @@ const updateAlarm = async (userId, roomId, alarm) => {
       throw new CustomError("알람 변경 실패", StatusCodes.BAD_REQUEST);
     }
 
-    const [[result]] = await conn.query(memberQueries.getAlarmInfo, [
-      userId,
-      roomId,
-    ]);
-    console.log(`changed alarm info : ${result.alarm}`);
-    if (result.alarm == alarm) {
-      console.log(`alarm changed : room(${roomId}) alarm(${alarm})`);
-    } else {
-      console.log("failed to changing Alarm");
-    }
     return {
       messsage: "알람 변경 성공",
     };
   } catch (err) {
     console.log(err);
-
     throw err;
   }
 };

@@ -80,6 +80,9 @@ const createMembersAttendance = async (scheduleId, roomId, title, dateTime) => {
 
 const createSchedule = async (roomId, title, date, time, isAttendance) => {
   try {
+    const scheduleId = uuidv4();
+    const dateTime = new Date(`${date}T${time}`); // 날짜 + 시간
+
     if (isAttendance && dateTime < new Date()) {
       console.log();
       throw new CustomError(
@@ -87,8 +90,7 @@ const createSchedule = async (roomId, title, date, time, isAttendance) => {
         StatusCodes.BAD_REQUEST
       );
     }
-    const scheduleId = uuidv4();
-    const dateTime = new Date(`${date}T${time}`); // 날짜 + 시간
+
     const values = [scheduleId, roomId, title, dateTime, isAttendance];
 
     const [scheduleResult] = await conn.query(
@@ -124,7 +126,10 @@ const deleteSchedule = async (scheduleId) => {
       throw new CustomError("일정을 찾을 수 없습니다.", StatusCodes.NOT_FOUND);
     }
 
-    if (scheduleResult.is_attendance) {
+    if (
+      scheduleResult.is_attendance &&
+      new Date(scheduleResult.date) < new Date()
+    ) {
       throw new CustomError(
         "과거의 출석 일정은 삭제할 수 없습니다.",
         StatusCodes.BAD_REQUEST

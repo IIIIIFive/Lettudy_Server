@@ -193,13 +193,16 @@ const updateAlarm = async (userId, roomId, alarm) => {
     ]);
 
     if (updateAlarmResult.affectedRows === 0) {
+      console.log("updating alarm didn't work");
       throw new CustomError("알람 변경 실패", StatusCodes.BAD_REQUEST);
     }
-
+    console.log(`alarm changed : room(${roomId}) alarm(${alarm})`);
     return {
       messsage: "알람 변경 성공",
     };
   } catch (err) {
+    console.log(err);
+    console.log("failed to changing Alarm");
     throw err;
   }
 };

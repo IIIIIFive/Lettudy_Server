@@ -86,7 +86,7 @@ const createSchedule = async (roomId, title, date, time, isAttendance) => {
     if (isAttendance && dateTime < new Date()) {
       console.log();
       throw new CustomError(
-        "과거 날짜에는 출석 일정을 추가할 수 없습니다.",
+        "지난 날짜에는 출석 일정을 추가할 수 없습니다.",
         StatusCodes.BAD_REQUEST
       );
     }
@@ -131,7 +131,7 @@ const deleteSchedule = async (scheduleId) => {
       new Date(scheduleResult.date) < new Date()
     ) {
       throw new CustomError(
-        "과거의 출석 일정은 삭제할 수 없습니다.",
+        "지난 출석 일정은 삭제할 수 없습니다.",
         StatusCodes.BAD_REQUEST
       );
     }

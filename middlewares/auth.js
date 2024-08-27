@@ -5,7 +5,7 @@ const { checkRoom } = require("../services/roomService");
 const { checkMember } = require("../services/memberService");
 
 const createAccessToken = (userId) => {
-  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: "12h" });
+  return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: "6h" });
 };
 
 const verifyToken = (req, res, next) => {

@@ -27,22 +27,13 @@ const getChats = async (roomId) => {
     for (let chatItem of chatItemsResult[0]) {
       const userId = chatItem.sender;
       const userResult = await conn.query(userQueries.getNameById, userId);
-      chatItem.sender = userResult[0][0].name;
+      chatItem.sender = userResult[0][0]?.name || "알 수 없음";
+      const profileResult = await conn.query(
+        memberQueries.getProfileNumByUserId,
+        [userId, roomId]
+      );
 
-      const [[{ count }]] = await conn.query(memberQueries.checkMember, [
-        roomId,
-        userId,
-      ]);
-
-      if (count) {
-        const [[profileResult]] = await conn.query(
-          memberQueries.getProfileNumByUserId,
-          [userId, roomId]
-        );
-        chatItem.profileNum = profileResult.profile_num;
-      } else {
-        chatItem.profileNum = 0;
-      }
+      chatItem.profileNum = profileResult[0][0]?.profile_num || 7;
     }
 
     return {

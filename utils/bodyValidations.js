@@ -60,6 +60,13 @@ const createIdChain = (fieldName) =>
     .isLength({ min: 36, max: 36 })
     .withMessage(`${fieldName} 필드는 36자입니다.`);
 
+const createUrlChain = (fieldName) =>
+  body(fieldName)
+    .notEmpty()
+    .withMessage(`${fieldName} 필드는 공란일 수 없습니다.`)
+    .isURL()
+    .withMessage(`URL 형식이 유효하지 않습니다.`);
+
 module.exports = {
   createEmailChain,
   createDateChain,
@@ -69,4 +76,5 @@ module.exports = {
   createArrayChain,
   createBooleanChain,
   createIdChain,
+  createUrlChain,
 };

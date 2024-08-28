@@ -5,7 +5,7 @@ const linkController = require("../controllers/linksController");
 const { createIdChain } = require("../utils/paramValidations");
 const {
   createStringWithLimitChain,
-  createStringChain,
+  createUrlChain,
 } = require("../utils/bodyValidations");
 
 const linkRouter = express.Router();
@@ -15,7 +15,7 @@ linkRouter.post(
   validate([
     createIdChain("roomId", 36),
     createStringWithLimitChain("title", 100),
-    createStringChain("link"),
+    createUrlChain("link"),
   ]),
   verifyToken,
   authorizeUser,

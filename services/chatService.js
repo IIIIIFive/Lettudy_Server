@@ -28,11 +28,21 @@ const getChats = async (roomId) => {
       const userId = chatItem.sender;
       const userResult = await conn.query(userQueries.getNameById, userId);
       chatItem.sender = userResult[0][0].name;
-      const profileNum = await conn.query(memberQueries.getProfileNumByUserId, [
-        userId,
+
+      const [[{ count }]] = await conn.query(memberQueries.checkMember, [
         roomId,
+        userId,
       ]);
-      chatItem.profileNum = profileNum[0][0].profile_num;
+
+      if (count) {
+        const [[profileResult]] = await conn.query(
+          memberQueries.getProfileNumByUserId,
+          [userId, roomId]
+        );
+        chatItem.profileNum = profileResult.profile_num;
+      } else {
+        chatItem.profileNum = 0;
+      }
     }
 
     return {

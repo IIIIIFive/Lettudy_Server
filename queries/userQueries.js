@@ -9,10 +9,6 @@ const userQueries = {
 
   deleteUser: `DELETE FROM users WHERE id = ?`,
 
-  setForeignKeyOff: `SET foreign_key_checks = 0`,
-
-  setForeignKeyOn: `SET foreign_key_checks = 1`,
-
   checkEmail: `SELECT COUNT(*) as count FROM users WHERE email = ?`,
 
   updateFcmToken: `UPDATE users SET fcm_token = ? WHERE id = ?`,

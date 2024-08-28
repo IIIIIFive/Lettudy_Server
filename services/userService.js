@@ -71,7 +71,9 @@ const login = async (email, password) => {
 
 const deleteUser = async (userId) => {
   try {
+    await conn.query(userQueries.setForeignKeyOff);
     await conn.query(userQueries.deleteUser, userId);
+    await conn.query(userQueries.setForeignKeyOn);
 
     return {
       message: "회원 탈퇴 성공",

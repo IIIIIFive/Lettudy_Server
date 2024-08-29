@@ -19,7 +19,7 @@ const memberQueries = {
   `,
 
   getMembersName: `
-    SELECT name, profile_num
+    SELECT name, profile_num, user_id as id
     FROM users
     JOIN members
     ON users.id = members.user_id
@@ -34,7 +34,7 @@ const memberQueries = {
   `,
 
   getMembersAttendanceCount: `
-    SELECT  members.profile_num, COUNT(attendances.id) AS count
+    SELECT  members.user_id as id, COUNT(attendances.id) AS count
     FROM users
     LEFT JOIN members ON users.id = members.user_id
     LEFT JOIN attendances ON users.id = attendances.user_id AND attendances.status = 1

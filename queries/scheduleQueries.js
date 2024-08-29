@@ -18,9 +18,9 @@ const scheduleQueries = {
   `,
 
   getTotalAttendances: `
-    SELECT COUNT(*) AS totalCount
+    SELECT * 
     FROM schedules
-    WHERE room_id = ? AND is_attendance=1 AND schedules.date < NOW()
+    WHERE room_id = ? AND is_attendance=1 AND addtime(schedules.date, "0:20:0") > NOW()
   `,
 };
 

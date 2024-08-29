@@ -5,6 +5,8 @@ const memberQueries = require("../queries/memberQueries");
 const scheduleQueries = require("../queries/scheduleQueries");
 const attendanceQueries = require("../queries/attendanceQueries");
 const roomQueries = require("../queries/roomQueries");
+const { createAttendance } = require("./attendanceService");
+const { createAttendanceAlarm } = require("./scheduleService");
 
 const getProfileNum = async (roomId) => {
   const [profileResult] = await conn.query(
@@ -71,6 +73,26 @@ const createMember = async (userId, code) => {
       );
     }
 
+    const [attendanceSchedules] = await conn.query(
+      scheduleQueries.getTotalAttendances,
+      room.roomId
+    );
+
+    for (const schedule of attendanceSchedules) {
+      const { attendanceIds } = await createAttendance(schedule.id, [userId]);
+      const attendanceId = attendanceIds[0];
+
+      const alarmInfo = {
+        roomTitle: room.title,
+        scheduleTitle: schedule.title,
+        attendanceDate: new Date(
+          `${schedule.date.split(" ")[0]}T${schedule.date.split(" ")[1]}`
+        ),
+      };
+
+      await createAttendanceAlarm(attendanceId, userId, room.roomId, alarmInfo);
+    }
+
     const profileNum = await getProfileNum(room.roomId);
     const values = [userId, room.roomId, profileNum];
 
@@ -104,44 +126,33 @@ const checkMember = async (userId, roomId) => {
 
 const getMembersRecord = async (roomId) => {
   try {
-    const [[{ totalCount }]] = await conn.query(
-      scheduleQueries.getTotalAttendances,
-      roomId
-    );
-
-    if (totalCount === 0) {
-      const [members] = await conn.query(memberQueries.getMembersName, roomId);
-
-      return {
-        members: members.map((member) => ({
-          name: member.name,
-          profileNum: member.profile_num,
-          attendanceRate: 100,
-        })),
-      };
-    }
-
     const [members] = await conn.query(memberQueries.getMembersName, roomId);
 
-    const [memberResult] = await conn.query(
+    const [attendanceCounts] = await conn.query(
       memberQueries.getMembersAttendanceCount,
       [roomId, roomId]
     );
 
-    members.forEach((member) => {
-      const countInfo = memberResult.find(
-        ({ profile_num }) => profile_num === member.profile_num
+    for (const member of members) {
+      const countInfo = attendanceCounts.find(({ id }) => id === member.id);
+
+      const [[{ totalCount }]] = await conn.query(
+        attendanceQueries.getTotalAttendances,
+        [member.id, roomId]
       );
 
-      member.count = countInfo?.count || 0;
-    });
+      member.attendanceRate =
+        totalCount === 0
+          ? 100
+          : Math.round(((countInfo?.count || 0) * 100) / totalCount);
+    }
 
     return {
       message: "멤버 출석률 조회 성공",
       members: members.map((member) => ({
         name: member.name,
         profileNum: member.profile_num,
-        attendanceRate: Math.round((member.count * 100) / totalCount),
+        attendanceRate: member.attendanceRate,
       })),
     };
   } catch (err) {

@@ -24,6 +24,14 @@ const attendanceQueries = {
     ORDER BY date DESC
   `,
 
+  getTotalAttendances: `
+    SELECT COUNT(*) AS totalCount
+    FROM attendances
+    JOIN schedules
+    ON schedules.id = attendances.schedule_id
+    WHERE user_id = ? AND room_id = ? AND schedules.date < NOW()
+  `,
+
   deleteMemberAttendances: `
     DELETE FROM attendances
     WHERE user_id = ? AND schedule_id IN (SELECT id FROM schedules WHERE room_id = ?)

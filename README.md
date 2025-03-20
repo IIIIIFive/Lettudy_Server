@@ -16,9 +16,9 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 ## 📍 백엔드 팀원 구성
 
-| <img src="https://avatars.githubusercontent.com/u/124678039?v=4" width=80px alt=“강정윤/> | <img src="https://avatars.githubusercontent.com/u/149561623?v=4" width=80px alt=“박은지/> |
-| :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | --- |
-|                            [강정윤](https://github.com/kkang0)                            |                            [박은지](https://github.com/EJ-99)                             |     |
+| <img src="https://avatars.githubusercontent.com/u/124678039?v=4" width=80px alt="강정윤"/> | <img src="https://avatars.githubusercontent.com/u/149561623?v=4" width=80px alt="박은지"/> |
+| :----------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
+|                            [강정윤](https://github.com/kkang0)                             |                             [박은지](https://github.com/EJ-99)                             |
 
 </br>
 

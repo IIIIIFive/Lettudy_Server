@@ -1,20 +1,40 @@
-# Lettudy!
+# Let's Study, Letttudy!
 
-## 📍 프로젝트 개요
+![Group 428](https://github.com/user-attachments/assets/71bf9020-3987-46f4-bc98-727c9f0863f7)
 
-### Let’s Study! Lettudy!
+#### 🔗Website
+[Lettudy](lettudy.netlify.app)
+#### 🔗Youtube
+[Lettudy 프로젝트 발표 영상](https://www.youtube.com/watch?v=t0cABgT_zrQ&list=PLM1R75VoMYgk7rJZC3wsldrfy6Y7rFAaW&index=34)
+#### 🔗Notion
+[Lettudy Notion](https://github.com/IIIIIFive)
+#### 🔗GitHub
+[Lettudy Team GitHub](https://github.com/IIIIIFive)
+#### 🔗Figma
+[Lettudy Figma](https://www.figma.com/design/XbazEn8vTu3bqniAX4suHa/Lettudy?t=VMKVuG7YMKE4K82l-0)
 
-Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고, 동기부여를 도와주는 스터디 관리 서비스입니다 <br />
+<br/>
+
+## 😺 Lettudy 기획 이유
+- 스터디를 진행하다보면 사소한 불편함을 겪을 때가 많은데, 저희 팀의 경우 공통적으로 아래와 같은 사항이 번거롭다고 느껴졌습니다.
+ 
+    - 🙍‍♀️ "팀원들이 불참하는 일이 잦고 일정 관리가 어려워요"
+    - 🙅 "매번 팀원들과 기억하는 내용이 달라요"
+    - 🙎‍♂️ "기존 플랫폼은 사용법을 익혀야해서 사용이 부담스러워요"
+    - 🤦 "필요한 기능이 흩어져있어서 시간을 허비하게 돼요"
+<br/>
+
+ **✅ Lettudy팀은 위와 같은 문제점을 개선하고 공부에만 집중할 수 있도록 스터디 관리 서비스를 기획하게 되었습니다.**
 
 </br>
 
-## 📍 개발 기간
+## 😺 개발 기간
 
 2024.07.19 ~ 2024.08.30
 
 </br>
 
-## 📍 백엔드 팀원 구성
+## 😺 백엔드 팀원 구성
 
 | <img src="https://avatars.githubusercontent.com/u/124678039?v=4" width=80px alt="강정윤"/> | <img src="https://avatars.githubusercontent.com/u/149561623?v=4" width=80px alt="박은지"/> |
 | :----------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: |
@@ -22,27 +42,19 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 </br>
 
-## 📍 기술스택
+## 😺 기술스택
 
 <img width="900" alt="기술스택" src="https://github.com/user-attachments/assets/97dae64a-4acb-4d19-8573-20d7195ab3d4" />
 
 <br />
 
-## 📍 아키텍처
+## 😺 아키텍처
 
 <img width="900" alt="아키텍처" src="https://github.com/user-attachments/assets/b57578f4-7705-48e3-a1a9-520e6bf6d09e" />
 
 <br />
 
-</br>
-
-## 📍 아키텍처
-
-<img width="900" alt="아키텍처" src="https://github.com/user-attachments/assets/b57578f4-7705-48e3-a1a9-520e6bf6d09e" />
-
-</br>
-
-## 📍 주요 페이지 소개
+## 😺 주요 페이지 소개
 
 ### 1️⃣ 메인페이지
 
@@ -82,12 +94,11 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 ### 6️⃣ 채팅
 
 - 스터디원들과 함께 실시간 채팅을 즐길 수 있습니다.
-
-![Image](https://github.com/user-attachments/assets/f75535d4-b470-4fde-82f4-0091e2be4207)
+  ![Image](https://github.com/user-attachments/assets/f75535d4-b470-4fde-82f4-0091e2be4207)
 
 </br>
 
-## 📍 개발파트
+## 😺 개발파트
 
 **강정윤**
 
@@ -107,7 +118,7 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 </br>
 
-## 📍 API 명세서
+## 😺 API 명세서
 
 <img width="900" alt="회원" src="https://github.com/user-attachments/assets/5607bf76-91ff-4b13-8958-e35ebfae4ab4" />
 <img width="900" alt="방" src="https://github.com/user-attachments/assets/7c870adb-1355-4484-9a1c-a7cce0e1f7ee" />
@@ -121,6 +132,6 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 </br>
 
-## 📍 ERD
+## 😺 ERD
 
 <img width="900" alt="ERD" src="https://github.com/user-attachments/assets/a87bfcf9-8b6f-4271-ab70-d9086d47cad8" />

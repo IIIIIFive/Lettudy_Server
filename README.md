@@ -77,8 +77,7 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 ### 4️⃣ 일정 등록
 - 캘린더에 일정을 등록, 삭제 할 수 있습니다.
-
-![Image](https://github.com/user-attachments/assets/dbf335c7-5863-48e4-9b1f-74708200f6d6)
+  ![Image](https://github.com/user-attachments/assets/dbf335c7-5863-48e4-9b1f-74708200f6d6)
 
 ### 5️⃣ 출석하기
 

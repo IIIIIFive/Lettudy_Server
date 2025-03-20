@@ -61,8 +61,7 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 ### 2️⃣ 회원가입/로그인
 - 이름, 이메일, 비밀번호를 통해 회원가입을 할 수 있습니다.
-
-![Image](https://github.com/user-attachments/assets/cc339a25-77f9-4b50-9ba3-808e3f4988e5)
+  ![Image](https://github.com/user-attachments/assets/cc339a25-77f9-4b50-9ba3-808e3f4988e5)
 <img width="1624" alt="Image" src="https://github.com/user-attachments/assets/354ac3bf-f4a5-45e2-a575-ffefb8f41a70" />
 
 ### 3️⃣ 스터디방

@@ -5,7 +5,6 @@
 ### Let’s Study! Lettudy!
 Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고, 동기부여를 도와주는 스터디 관리 서비스입니다 <br />
 
-<<<<<<< HEAD
 **Let’s Study! Lettudy!**
 
 </br>
@@ -16,22 +15,13 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 </br>
 
-## 📍 백엔드 팀원 구성
-=======
-### 개발기간
-2024.07.22 ~ 2024.08.30
->>>>>>> bd0c4f8acc06be9c0ca796ffc2d98f8d402be3a1
 
-### 백엔드 팀원 구성
+## 📍 백엔드 팀원 구성
 | <img src="https://avatars.githubusercontent.com/u/124678039?v=4" width=80px alt=“강정윤/> | <img src="https://avatars.githubusercontent.com/u/149561623?v=4" width=80px alt=“박은지/> |
 | :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
-|                            [강정윤](https://github.com/kkang0)                            |                            [박은지](https://github.com/EJ-99)                             |
+|                            [강정윤](https://github.com/kkang0)                            |                            [박은지](https://github.com/EJ-99)                             |                            |
 
-<<<<<<< HEAD
 </br>
-=======
-<br />
->>>>>>> bd0c4f8acc06be9c0ca796ffc2d98f8d402be3a1
 
 ## 📍 기술스택
 

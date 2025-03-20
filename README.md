@@ -3,6 +3,7 @@
 ## 📍 프로젝트 개요
 
 ### Let’s Study! Lettudy!
+
 Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고, 동기부여를 도와주는 스터디 관리 서비스입니다 <br />
 
 </br>
@@ -13,11 +14,11 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 
 </br>
 
-
 ## 📍 백엔드 팀원 구성
+
 | <img src="https://avatars.githubusercontent.com/u/124678039?v=4" width=80px alt=“강정윤/> | <img src="https://avatars.githubusercontent.com/u/149561623?v=4" width=80px alt=“박은지/> |
-| :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
-|                            [강정윤](https://github.com/kkang0)                            |                            [박은지](https://github.com/EJ-99)                             |                            |
+| :---------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: | --- |
+|                            [강정윤](https://github.com/kkang0)                            |                            [박은지](https://github.com/EJ-99)                             |     |
 
 </br>
 
@@ -48,11 +49,13 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 <img width="1624" alt="Image" src="https://github.com/user-attachments/assets/504d3fec-2df8-48ba-afa3-f7c2f65eeb57" />
 
 ### 2️⃣ 회원가입/로그인
+
 - 이름, 이메일, 비밀번호를 통해 회원가입을 할 수 있습니다.
   ![Image](https://github.com/user-attachments/assets/cc339a25-77f9-4b50-9ba3-808e3f4988e5)
-<img width="1624" alt="Image" src="https://github.com/user-attachments/assets/354ac3bf-f4a5-45e2-a575-ffefb8f41a70" />
+  <img width="1624" alt="Image" src="https://github.com/user-attachments/assets/354ac3bf-f4a5-45e2-a575-ffefb8f41a70" />
 
 ### 3️⃣ 스터디방
+
 - 스터디방 내부에서 스터디를 위한 모든 기능을 한 눈에 확인할 수 있습니다.
   ![Image](https://github.com/user-attachments/assets/a0cecc35-8608-4f71-a07d-c745e3b8333d)
 
@@ -64,6 +67,7 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
   스터디에 필요한 자료들을 모아 정리할 수 있습니다.
 
 ### 4️⃣ 일정 등록
+
 - 캘린더에 일정을 등록, 삭제 할 수 있습니다.
   ![Image](https://github.com/user-attachments/assets/dbf335c7-5863-48e4-9b1f-74708200f6d6)
 
@@ -76,6 +80,7 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
   ![Image](https://github.com/user-attachments/assets/1b44e463-e7a4-42ec-a269-b42c2a8c918a)
 
 ### 6️⃣ 채팅
+
 - 스터디원들과 함께 실시간 채팅을 즐길 수 있습니다.
 
 ![Image](https://github.com/user-attachments/assets/f75535d4-b470-4fde-82f4-0091e2be4207)
@@ -100,11 +105,7 @@ Lettudy는 스터디를 하며 발생하는 번거로운 일들을 줄여주고,
 - 웹 푸시 알람 구현
 - 노트작성 API 구현
 
-<<<<<<< HEAD
 </br>
-=======
-<br />
->>>>>>> bd0c4f8acc06be9c0ca796ffc2d98f8d402be3a1
 
 ## 📍 API 명세서
 
